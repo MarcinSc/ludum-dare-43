@@ -1,0 +1,99 @@
+buildscript {
+    
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+        google()
+    }
+    dependencies {
+
+    }
+}
+
+allprojects {
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+
+    version = '1.0'
+    ext {
+        appName = "ludum-dare-43"
+        gdxVersion = '1.9.8'
+        roboVMVersion = '2.3.5'
+        box2DLightsVersion = '1.4'
+        ashleyVersion = '1.7.0'
+        aiVersion = '1.8.0'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }
+}
+
+project(":desktop") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    }
+}
+
+project(":core") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":secsy-gaming")
+
+        compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    }
+}
+
+project(":secsy-gaming") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":secsy-entity")
+
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    }
+}
+
+project(":secsy-entity") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":secsy-context")
+
+        compile "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
+        compile "com.googlecode.json-simple:json-simple:1.1.1"
+        testCompile "org.mockito:mockito-all:1.10.19"
+    }
+}
+
+project(":secsy-context") {
+    apply plugin: "java"
+
+    dependencies {
+        compile "org.reflections:reflections:0.9.9"
+        compile "org.javassist:javassist:3.20.0-GA"
+        compile "com.google.guava:guava:20.0"
+    }
+}
+
+tasks.eclipse.doLast {
+    delete ".project"
+}
