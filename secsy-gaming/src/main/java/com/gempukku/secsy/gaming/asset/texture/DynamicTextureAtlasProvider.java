@@ -7,13 +7,14 @@ import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
+import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.google.common.collect.Iterables;
 
 import java.util.*;
 
 @RegisterSystem(
         profiles = "textureAtlas", shared = TextureAtlasProvider.class)
-public class DynamicTextureAtlasProvider implements TextureAtlasProvider {
+public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem implements TextureAtlasProvider {
     private Map<String, PixmapPacker> packers = new HashMap<String, PixmapPacker>();
     private Map<String, TextureAtlas> textureAtlases = new HashMap<String, TextureAtlas>();
     private Map<String, Map<String, TextureRegion>> textures = new HashMap<String, Map<String, TextureRegion>>();
@@ -51,5 +52,15 @@ public class DynamicTextureAtlasProvider implements TextureAtlasProvider {
             textureRegionMap.put(name, textureRegion);
         }
         return textureRegion;
+    }
+
+    @Override
+    public void destroy() {
+        for (TextureAtlas textureAtlas : textureAtlases.values()) {
+            textureAtlas.dispose();
+        }
+        for (PixmapPacker pixmapPacker : packers.values()) {
+            pixmapPacker.dispose();
+        }
     }
 }
