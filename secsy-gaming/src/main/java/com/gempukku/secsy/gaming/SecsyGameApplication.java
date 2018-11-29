@@ -38,7 +38,7 @@ public class SecsyGameApplication extends ApplicationAdapter {
                 });
         systemProducer.scanReflections(new Reflections());
         context = new SECSyContext(systemProducer);
-        context.setDebug(true);
+        context.setDebug(false);
     }
 
     @Override

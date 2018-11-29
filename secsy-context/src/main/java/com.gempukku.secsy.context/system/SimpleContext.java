@@ -78,7 +78,8 @@ public class SimpleContext implements SystemContext {
 
         for (LifeCycleSystem lifeCycleSystem : lifeCycleSystems) {
             long start = System.currentTimeMillis();
-            System.out.println("Initializing: " + lifeCycleSystem.getClass());
+            if (debug)
+                System.out.println("Initializing: " + lifeCycleSystem.getClass());
             lifeCycleSystem.initialize();
             long time = System.currentTimeMillis() - start;
             String message = time + "ms - Initialization of " + lifeCycleSystem.getClass().getSimpleName();
