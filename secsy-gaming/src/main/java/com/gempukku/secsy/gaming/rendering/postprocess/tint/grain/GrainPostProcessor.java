@@ -3,6 +3,7 @@ package com.gempukku.secsy.gaming.rendering.postprocess.tint.grain;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -13,12 +14,10 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
-import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
-import com.gempukku.secsy.gaming.asset.texture.TextureAtlasProvider;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderPipeline;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 import com.gempukku.secsy.gaming.rendering.postprocess.tint.texture.TextureTintShaderProvider;
@@ -29,17 +28,19 @@ import java.util.Random;
         profiles = "grainPostProcessor"
 )
 public class GrainPostProcessor extends AbstractLifeCycleSystem {
-    @Inject
-    private TextureAtlasProvider textureAtlasProvider;
-
     private ModelBatch modelBatch;
 
     private TextureTintShaderProvider tintShaderProvider;
     private ModelInstance modelInstance;
     private Model model;
+    private Texture grainTexture;
+    private TextureRegion grainTextureRegion;
 
     @Override
     public void preInitialize() {
+        grainTexture = new Texture(Gdx.files.internal("image/grain.png"));
+        grainTextureRegion = new TextureRegion(grainTexture);
+
         tintShaderProvider = new TextureTintShaderProvider();
 
         modelBatch = new ModelBatch(tintShaderProvider);
@@ -102,23 +103,23 @@ public class GrainPostProcessor extends AbstractLifeCycleSystem {
 
     private void setupTintTexture(Camera camera, GrainComponent tint) {
         tintShaderProvider.setTintTextureIndex(1);
-        TextureRegion texture = textureAtlasProvider.getTexture("grainPostProcessor", "image/grain.png");
 
-        int tintTextureHandle = texture.getTexture().getTextureObjectHandle();
+        int tintTextureHandle = grainTexture.getTextureObjectHandle();
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, tintTextureHandle);
 
-        tintShaderProvider.setTintTextureOrigin(new Vector2(texture.getU(), texture.getV()));
-        tintShaderProvider.setTintTextureSize(new Vector2(texture.getU2() - texture.getU(), texture.getV2() - texture.getV()));
+        tintShaderProvider.setTintTextureOrigin(new Vector2(grainTextureRegion.getU(), grainTextureRegion.getV()));
+        tintShaderProvider.setTintTextureSize(new Vector2(grainTextureRegion.getU2() - grainTextureRegion.getU(), grainTextureRegion.getV2() - grainTextureRegion.getV()));
 
         tintShaderProvider.setRepeatFactor(
                 new Vector2(
-                        Gdx.graphics.getWidth() / texture.getRegionWidth() / tint.getGrainSize(),
-                        Gdx.graphics.getHeight() / texture.getRegionHeight() / tint.getGrainSize()));
+                        Gdx.graphics.getWidth() / grainTextureRegion.getRegionWidth() / tint.getGrainSize(),
+                        Gdx.graphics.getHeight() / grainTextureRegion.getRegionHeight() / tint.getGrainSize()));
     }
 
     @Override
     public void postDestroy() {
+        grainTexture.dispose();
         modelBatch.dispose();
         model.dispose();
     }

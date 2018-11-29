@@ -62,7 +62,7 @@ public class SplashRenderer extends AbstractLifeCycleSystem {
 
         long time = timeManager.getTime();
         long startTime = splashSeriesComponent.getStartTime();
-        if (time > startTime) {
+        if (time >= startTime) {
             SplashDefinition splashDefinition = getSplashDefinition(splashDefinitions, time - startTime);
             if (splashDefinition != null) {
                 String textureAtlasId = splashSeriesComponent.getTextureAtlasId();
