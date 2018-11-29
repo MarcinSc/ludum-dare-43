@@ -13,4 +13,6 @@ public interface AudioManager {
     void playSound(Sound sound);
 
     void setBackgroundMusic(Music music, long fadeTime);
+
+    boolean isBackgroundMusic(Music music);
 }

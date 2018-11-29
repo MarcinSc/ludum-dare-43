@@ -59,7 +59,7 @@ public class AudioSystem extends AbstractLifeCycleSystem implements AudioManager
 
     @Override
     public void setBackgroundMusic(Music music, long fadeTime) {
-        if (oldBackgroundMusic != music) {
+        if (backgroundMusic != music) {
             musicFadeOutTime = fadeTime;
             if (oldBackgroundMusic != null)
                 oldBackgroundMusic.stop();
@@ -71,5 +71,10 @@ public class AudioSystem extends AbstractLifeCycleSystem implements AudioManager
             }
             musicSwitchTime = System.currentTimeMillis();
         }
+    }
+
+    @Override
+    public boolean isBackgroundMusic(Music music) {
+        return backgroundMusic == music;
     }
 }
