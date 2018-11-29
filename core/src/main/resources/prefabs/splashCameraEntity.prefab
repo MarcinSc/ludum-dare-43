@@ -1,4 +1,5 @@
 {
+  "Camera2D": {},
   "SplashSeries": {
     "startTime": 0,
     "textureAtlasId": "splashScreen",
