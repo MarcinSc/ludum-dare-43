@@ -1,0 +1,83 @@
+Themes
+1. Automation
+- This theme automatically leads to some kind of puzzle game, where the goal is to automate some process, but that's the
+obvious interpretation.
+
+2. Break the cycle
+- Bicycle riding through rough terrain?
+- Enemies ride on bicycles?
+- Break the seasons cycle by changing climate? Pollution?
+- Cycle of life and death?
+
+3. Control the environment, not the player
+- "Lemmings" inspired game, where the goal is to get some percentage of characters to safety through the environment by
+building ramps, and other contraptions. Characters go to produce resources, when they encounter a farm/mine, but each
+place has a limit on how many characters can work there.
+
+4. Each playthrough builds on the last
+- Player has to go through the same level multiple times in the row, but each playthrough has persistent changes from
+last run. For example all the levers that have been switched remain so, and levers can control multiple elements
+(opening one door, closing another). Very challenging level design. Maybe provide level editor to allow people to create
+and share their own levels (time constraints?)
+
+5. Everything grows
+- Killing enemies spills their blood on the ground. The blood energy accumulates over time (some cool shader), and when
+reaches a limit, from the blood a new enemy type is born. Maybe different enemies spill different types of energies -
+fire, ice, animal, earth, and from different types of energies different enemies can be spawned.
+- Puzzle game, where different elements grow (change size) based on some triggers. Different elements can grow at
+different speeds.
+
+6. It only changes when you aren't looking
+- "Doctor Who" inspired game with Weeping Angels. Player has a cone of vision displayed and angels are trying to reach
+him (to kill). Angels are able to move only when not in player's vision. 2d top-down display of the room, with player,
+angels and the target (Tardis?). Additional feature possible - mirrors that extend the field of vision, using normal
+reflection world rules. Also, maybe cameras, that can be setup by player to provide additional field of vision. Maybe
+angels only move, when player moves and/or turn, that will give player time to think.
+
+7. Sacrifices must be made
+- Player disembowels sacrificial animals to create items.
+- Tribe, controlled by player, has to sacrifice animals/enemies to appease Gods and receive blessings. If sacrifices are
+not made, Gods get angry and destroy player's progress/kill tribesmen.
+
+8. Absorb your enemies
+- This could be just a simple adventure game, where you can absorb enemies' energy to regain health/mana, but also maybe
+something that will allow you to temporarily gain their powers, therefore absorbing their essence.
+
+9. Darkness is your friend
+- "Darkness" could be an NPC character that follows player (with some cool shader), that has some special abilities that
+trigger automatically on proximity to interesting objects (torch, etc). Maybe player would be able to give some simple
+commands to the NPC.
+- Player has to hide in shadows to avoid detection, very obvious interpretation, but with cool GFX this can turn out to
+be juicy stealth kind of game.
+
+10. Don't trust the game
+- Game full of traps. The same kind of traps may look the same, but work differently - very uncool design, unless the
+traps can be avoided with reflexes, no matter what kind of trap it is. Traps could be randomly assigned function upon
+level (re)start, so that when player dies, the traps might change, even though they look the same.
+
+11. Magic, but at what cost?
+- Player can execute some powerful attacks, but each attack depletes player's energy/health, which can only be recovered
+by killing opponents. For balance, attacks cannot automatically hit, but failing casting or missing enemies has to be
+a real possibility.
+- Player can cast spells at a cost of sanity (Lovecraft)? Player can gain some quirks the lower the sanity is and might
+gradually lose control of the character (move slower, jump lower, occasionally reverses controls, randomly jumps). There
+should be a mechanism for regaining sanity, or just see how far the player can go with the quirks piling up.
+
+12. Making connections
+- Can be a simple connect-three kind of puzzle game, but that's very obvious and not very creative. Maybe some kind of
+twist could be added to the mechanics. Has a potential for some cool GFX and shaders.
+
+13. One item, many uses
+- Point and click adventure, but requires a lot of art assets, which I can't do.
+- Items available to character can have limited number of uses (more than one).
+
+14. Take one, leave one
+- Puzzle game, where player is presented with choice of two things at a time, and can choose just one to use.
+
+15. Two connected worlds
+- Platformer, where player can travel through two parallel worlds. Maybe some items that allow to look into the other
+side on demand.
+
+16. Evolve
+- Through exploration and killing, player accumulates different types of energies, and based on those energies evolves
+different body parts/abilities.
