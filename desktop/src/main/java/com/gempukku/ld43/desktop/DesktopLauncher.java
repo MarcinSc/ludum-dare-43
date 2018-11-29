@@ -28,6 +28,9 @@ public class DesktopLauncher {
         activeProfiles.add("pipelineRenderer");
         activeProfiles.add("easing");
         activeProfiles.add("time");
+        activeProfiles.add("splash");
+        activeProfiles.add("textureAtlas");
+        activeProfiles.add("2dCamera");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 800;
