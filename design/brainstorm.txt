@@ -1,0 +1,8 @@
+Sacrifices must be made
+- Player disembowels sacrificial animals to create items.
+
+- Tribe, controlled by player, has to sacrifice animals/enemies to appease Gods and receive blessings. If sacrifices are
+not made, Gods get angry and destroy player's progress/kill tribesmen.
+
+- Player plays a God, and helps a tribe using its powers. The powers have a cost, and the currency is earned when tribe
+makes sacrifices.
