@@ -5,6 +5,9 @@ General design:
 2d platformer, player takes control of a Mom, that fights monsters made of dirty clothes, kitchen utensils, etc. to
 reach the level's goal - a small child, possibly sleeping in a cot.
 
+Unique mechanics:
+The story will not carry the game alone.
+
 Ideas:
 1. When player dies, a screen goes to black and voice over, or text is shown: "You've been home all day, and you did not
 even clean the house?"

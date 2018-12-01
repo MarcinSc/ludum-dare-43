@@ -6,12 +6,12 @@
     "splashDefinitions": [
       {
         "textureName": "images/badlogic.jpg",
-        "duration": 1000,
+        "duration": 1,
         "backgroundColor": "0,0,0"
       },
       {
         "textureName": "images/JGD-logo-large.png",
-        "duration": 2000,
+        "duration": 2,
         "backgroundColor": "255,255,255"
       }
     ]

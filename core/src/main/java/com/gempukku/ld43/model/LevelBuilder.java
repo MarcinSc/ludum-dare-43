@@ -8,7 +8,6 @@ import com.gempukku.secsy.entity.EntityManager;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
-import com.gempukku.secsy.gaming.physics.basic2d.EntityMoved;
 import com.gempukku.secsy.gaming.physics.basic2d.ObstacleComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorTriggerComponent;
 
@@ -21,11 +20,33 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
     public void initialize(GoToGame goToGame) {
         createPlayer();
         createPlatforms();
+        createEnemies();
+        createExits();
     }
 
-    @ReceiveEvent
-    public void entityMoved(EntityMoved entityMoved, EntityRef entity, PlayerComponent player, Position2DComponent position) {
-        System.out.println("Player position: " + position.getX() + ", " + position.getY());
+    private void createExits() {
+        EntityRef levelExit = entityManager.createEntityFromPrefab("levelExit");
+        Position2DComponent position = levelExit.getComponent(Position2DComponent.class);
+        position.setX(5.5f);
+        position.setY(1.1f);
+        levelExit.saveChanges();
+    }
+
+    private void createEnemies() {
+        createEnemy("patrollingEnemy", 2f, 0f);
+    }
+
+    private void createPlatforms() {
+        createPlatform(0f, -0.1f, 3f, 0.1f);
+        createPlatform(3f, 1f, 3f, 0.1f);
+    }
+
+    private void createEnemy(String prefab, float x, float y) {
+        EntityRef enemy = entityManager.createEntityFromPrefab(prefab);
+        Position2DComponent position = enemy.getComponent(Position2DComponent.class);
+        position.setX(x);
+        position.setY(y);
+        enemy.saveChanges();
     }
 
     private void createPlayer() {
@@ -34,11 +55,6 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         position.setX(0.1f);
         position.setY(3);
         playerEntity.saveChanges();
-    }
-
-    private void createPlatforms() {
-        createPlatform(0f, -0.1f, 3f, 0.1f);
-        createPlatform(3f, 1f, 3f, 0.1f);
     }
 
     private void createPlatform(float x, float y, float width, float height) {

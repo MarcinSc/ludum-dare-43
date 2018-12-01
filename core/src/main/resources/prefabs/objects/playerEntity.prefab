@@ -21,6 +21,20 @@
         "right": 0.1,
         "up": 0.01,
         "down": -0.01
+      },
+      {
+        "type": "vulnerableSensor",
+        "left": -0.08,
+        "right": 0.08,
+        "up": 0.18,
+        "down": 0.02
+      },
+      {
+        "type": "completionSensor",
+        "left": -0.08,
+        "right": 0.08,
+        "up": 0.18,
+        "down": 0.02
       }
     ]
   },
@@ -32,5 +46,6 @@
     "jumpSpeed": 4,
     "moveSpeed": 2,
     "jumpMaxCount": 2
-  }
+  },
+  "Vulnerable": {}
 }
