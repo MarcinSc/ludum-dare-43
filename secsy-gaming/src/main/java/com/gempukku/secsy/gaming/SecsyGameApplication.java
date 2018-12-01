@@ -1,6 +1,7 @@
 package com.gempukku.secsy.gaming;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.gempukku.secsy.context.SECSyContext;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.ReflectionsAnnotatedTypesSystemProducer;
@@ -75,9 +76,16 @@ public class SecsyGameApplication extends ApplicationAdapter {
         if (physicsSystem != null)
             physicsSystem.processPhysics();
 
+        int resultWidth = width;
+        int resultHeight = height;
+        if (width == 0)
+            resultWidth = Gdx.graphics.getWidth();
+        if (height == 0)
+            resultHeight = Gdx.graphics.getHeight();
+
         // Render result
         RenderingSystem renderingSystem = context.getSystem(RenderingSystem.class);
-        renderingSystem.render(width, height);
+        renderingSystem.render(resultWidth, resultHeight);
     }
 
     @Override
