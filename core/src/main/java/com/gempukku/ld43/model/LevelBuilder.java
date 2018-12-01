@@ -1,5 +1,7 @@
 package com.gempukku.ld43.model;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.gempukku.ld43.menu.GoToGame;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
@@ -10,6 +12,14 @@ import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.ObstacleComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorTriggerComponent;
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.io.Reader;
 
 @RegisterSystem
 public class LevelBuilder extends AbstractLifeCycleSystem {
@@ -18,27 +28,54 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
 
     @ReceiveEvent
     public void initialize(GoToGame goToGame) {
-        createPlayer();
-        createPlatforms();
-        createEnemies();
-        createExits();
+        loadLevel("levels/level1.json");
     }
 
-    private void createExits() {
+    private void loadLevel(String levelFile) {
+        JSONObject level = loadJSON(levelFile);
+        JSONObject playerObject = (JSONObject) level.get("player");
+        JSONObject exitObject = (JSONObject) level.get("exit");
+        JSONArray enemyArray = (JSONArray) level.get("enemies");
+        JSONArray platformArray = (JSONArray) level.get("platforms");
+
+        createPlayer(getFloat(playerObject, "x"), getFloat(playerObject, "y"));
+        createExit(getFloat(exitObject, "x"), getFloat(exitObject, "y"));
+        for (Object enemy : enemyArray) {
+            JSONObject enemyObj = (JSONObject) enemy;
+            createEnemy((String) enemyObj.get("type"), getFloat(enemyObj, "x"), getFloat(enemyObj, "y"));
+        }
+        for (Object platform : platformArray) {
+            JSONObject platformObj = (JSONObject) platform;
+            createPlatform(getFloat(platformObj, "x"), getFloat(platformObj, "y"),
+                    getFloat(platformObj, "width"), getFloat(platformObj, "height"));
+        }
+    }
+
+    private JSONObject loadJSON(String levelFile) {
+        FileHandle file = Gdx.files.internal(levelFile);
+        JSONParser jsonParser = new JSONParser();
+        Reader reader = file.reader("UTF-8");
+        try {
+            return (JSONObject) jsonParser.parse(reader);
+        } catch (IOException exp) {
+            throw new RuntimeException("Unable to load level", exp);
+        } catch (ParseException exp) {
+            throw new RuntimeException("Unable to load level", exp);
+        } finally {
+            IOUtils.closeQuietly(reader);
+        }
+    }
+
+    private float getFloat(JSONObject object, String key) {
+        return ((Number) object.get(key)).floatValue();
+    }
+
+    private void createExit(float x, float y) {
         EntityRef levelExit = entityManager.createEntityFromPrefab("levelExit");
         Position2DComponent position = levelExit.getComponent(Position2DComponent.class);
-        position.setX(5.5f);
-        position.setY(1.1f);
+        position.setX(x);
+        position.setY(y);
         levelExit.saveChanges();
-    }
-
-    private void createEnemies() {
-        createEnemy("patrollingEnemy", 2f, 0f);
-    }
-
-    private void createPlatforms() {
-        createPlatform(0f, -0.1f, 3f, 0.1f);
-        createPlatform(3f, 1f, 3f, 0.1f);
     }
 
     private void createEnemy(String prefab, float x, float y) {
@@ -49,11 +86,11 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         enemy.saveChanges();
     }
 
-    private void createPlayer() {
+    private void createPlayer(float x, float y) {
         EntityRef playerEntity = entityManager.createEntityFromPrefab("playerEntity");
         Position2DComponent position = playerEntity.getComponent(Position2DComponent.class);
-        position.setX(0.1f);
-        position.setY(3);
+        position.setX(x);
+        position.setY(y);
         playerEntity.saveChanges();
     }
 

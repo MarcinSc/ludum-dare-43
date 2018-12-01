@@ -1,0 +1,31 @@
+{
+  "player": {
+    "x": 0.1,
+    "y": 3
+  },
+  "exit": {
+    "x": 5.5,
+    "y": 1.1
+  },
+  "enemies": [
+    {
+      "type": "patrollingEnemy",
+      "x": 2,
+      "y": 0
+    }
+  ],
+  "platforms": [
+    {
+      "x": 0,
+      "y": -0.1,
+      "width": 3,
+      "height": 0.1
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "width": 3,
+      "height": 0.1
+    }
+  ]
+}
