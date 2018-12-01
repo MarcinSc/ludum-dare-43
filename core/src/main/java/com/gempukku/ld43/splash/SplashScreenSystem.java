@@ -1,5 +1,7 @@
 package com.gempukku.ld43.splash;
 
+import com.gempukku.ld43.menu.GoToGame;
+import com.gempukku.ld43.menu.GoToMenu;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.entity.EntityRef;
@@ -19,5 +21,6 @@ public class SplashScreenSystem {
         cameraEntity.saveChanges();
 
         gameEntityProvider.getGameEntity().send(new GoToMenu());
+        gameEntityProvider.getGameEntity().send(new GoToGame());
     }
 }

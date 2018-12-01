@@ -1,4 +1,4 @@
-package com.gempukku.ld43.splash;
+package com.gempukku.ld43.menu;
 
 import com.gempukku.secsy.entity.event.Event;
 

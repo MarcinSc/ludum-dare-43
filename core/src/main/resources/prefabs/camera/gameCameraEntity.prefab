@@ -1,0 +1,16 @@
+{
+  "Camera2D": {},
+  "GameScreen": {},
+  "TrackingCamera": {
+    "followingNotGrounded": false,
+    "orientationBasedDistance": 0.1
+  },
+  "ZoomCamera": {
+    "xScale": 0.005,
+    "yScale": 0.005
+  },
+  "LerpCamera": {
+    "xProgress": 1,
+    "yProgress": 1
+  }
+}

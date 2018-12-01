@@ -1,6 +1,7 @@
 package com.gempukku.ld43.provider;
 
-import com.gempukku.ld43.splash.GoToMenu;
+import com.gempukku.ld43.menu.GoToGame;
+import com.gempukku.ld43.menu.GoToMenu;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -16,6 +17,7 @@ public class CameraEntityProviderImpl extends AbstractLifeCycleSystem implements
 
     private EntityRef splashCameraEntity;
     private EntityRef menuCameraEntity;
+    private EntityRef gameCameraEntity;
 
     private EntityRef currentCamera;
 
@@ -23,6 +25,7 @@ public class CameraEntityProviderImpl extends AbstractLifeCycleSystem implements
     public void initialize() {
         splashCameraEntity = entityManager.createEntityFromPrefab("splashCameraEntity");
         menuCameraEntity = entityManager.createEntityFromPrefab("menuCameraEntity");
+        gameCameraEntity = entityManager.createEntityFromPrefab("gameCameraEntity");
 
         currentCamera = splashCameraEntity;
     }
@@ -30,6 +33,11 @@ public class CameraEntityProviderImpl extends AbstractLifeCycleSystem implements
     @ReceiveEvent
     public void switchToMainMenu(GoToMenu goToMenu) {
         currentCamera = menuCameraEntity;
+    }
+
+    @ReceiveEvent
+    public void switchToGame(GoToGame goToGame) {
+        currentCamera = gameCameraEntity;
     }
 
     @Override

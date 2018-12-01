@@ -31,6 +31,8 @@ public class DesktopLauncher {
         activeProfiles.add("splash");
         activeProfiles.add("textureAtlas");
         activeProfiles.add("2dCamera");
+        activeProfiles.add("platformer2dMovement");
+        activeProfiles.add("basic2dPhysics");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 800;
