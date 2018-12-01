@@ -1,8 +1,31 @@
 Sacrifices must be made
+
 - Player disembowels sacrificial animals to create items.
 
-- Tribe, controlled by player, has to sacrifice animals/enemies to appease Gods and receive blessings. If sacrifices are
-not made, Gods get angry and destroy player's progress/kill tribesmen.
+Not much gameplay...
 
-- Player plays a God, and helps a tribe using its powers. The powers have a cost, and the currency is earned when tribe
-makes sacrifices.
+- Tribe, controlled by player, has to sacrifice animals/enemies to appease gods and receive blessings. If sacrifices are
+not made, gods get angry and destroy player's progress/kill tribesmen.
+
+Probably has to be 3d...
+
+- Player is a god and is tasked with helping out a tribe to grow. To use God-like powers, player must use some form of
+energy, that regenerates when the tribe makes sacrifices to the god.
+
+Probably has to be 3d...
+
+- Player is playing a mom, that is raising a child, doing chores, etc. while doing so, it speaks of how she chose to
+sacrifice her career for this.
+
+Maybe instead of doing chores, she fights monsters (platformer) made of dirty clothes, kitchen utensils/food, the end
+goal is reaching a child at the end of the level.
+
+When player dies, a screen goes to black and voice over, or text is shown: "You've been at home all day, and you did not
+even clean the house?"
+
+Sample quotes (spoken when a monster is killed):
+- I did not go to college for that...
+- And at the end of the day he will come home and tell me how tired he is...
+
+Game title: "MOM"
+Subtitle: "Sacrifices must(?) be made!"

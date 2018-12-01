@@ -31,15 +31,16 @@ public class DesktopLauncher {
         activeProfiles.add("splash");
         activeProfiles.add("textureAtlas");
         activeProfiles.add("2dCamera");
+        activeProfiles.add("platformer2dMovement");
+        activeProfiles.add("basic2dPhysics");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = 800;
-        config.height = 600;
+        config.fullscreen = true;
         config.resizable = false;
 
         config.foregroundFPS = 0;
         config.vSyncEnabled = true;
         config.title = "Ludum Dare 43";
-        new LwjglApplication(new SecsyGameApplication(800, 600, activeProfiles), config);
+        new LwjglApplication(new SecsyGameApplication(0, 0, activeProfiles), config);
     }
 }

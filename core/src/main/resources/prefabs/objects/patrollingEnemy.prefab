@@ -1,0 +1,12 @@
+{
+  "Position2D": {},
+  "SensorTrigger": {
+    "right": 0.1,
+    "up": 0.1
+  },
+  "Enemy": {
+    "right": 0.1,
+    "up": 0.1
+  },
+  "CausesVulnerability": {}
+}

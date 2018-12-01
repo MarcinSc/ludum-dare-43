@@ -1,0 +1,36 @@
+Game title: "MOM"
+Subtitle: "Sacrifices must(?) be made!"
+Dedication: To my Mom - for all the sacrifices she has made for me.
+
+General design:
+2d platformer, player takes control of a Mom, that fights monsters made of dirty clothes, kitchen utensils, etc. to
+reach the level's goal - a small child, possibly sleeping in a cot.
+
+Unique mechanics:
+The story will not carry the game alone.
+
+Braindump:
+- Maybe just make it a good fighting platformer with nice gfx - shaders etc.
+- Mother with superpowers?
+- Killing with broomstick? Maybe can fly on a broomstick - too strong if permanent, maybe unlockable or costs energy.
+- She sweeps as she walks, and there are some mechanics associated with dust on ground. The dust builds up over time and
+spawns dust bunnies.
+- Is it offensive to portray moms like that? Probably not, if the overall message of the game strongly shows that it's
+a sacrifice women make for their families.
+- Bush died!
+- Background is a wallpaper - baby blue color. Platforms have wood texture. Level is filled with common household items,
+just for decoration - tables, chairs, wall clock, etc. Items that look as if they could be jumped over, must be lighter
+in tone as to not to confuse player.
+- What props could be available in house? Light switches? Maybe some game mechanics based on light, or electricity.
+- Dust bunnies can look like Susuwatari from Spirited Away.
+- Maybe mother has to make sure the child is safe?
+
+
+Ideas:
+1. When player dies, a screen goes to black and voice over, or text is shown: "You've been home all day, and you did not
+even clean the house?"
+2. When player kills a monster, a quote is shown at the bottom of the screen.
+
+Sample quotes (spoken when a monster is killed):
+- I did not go to college for that...
+- And at the end of the day he will come home and tell me how tired he is...

@@ -1,0 +1,39 @@
+{
+  "player": {
+    "x": 0.1,
+    "y": 0
+  },
+  "exit": {
+    "x": 5.5,
+    "y": 0.7
+  },
+  "enemies": [
+  ],
+  "platforms": [
+    {
+      "x": 0,
+      "y": -0.1,
+      "width": 3,
+      "height": 0.1
+    },
+    {
+      "x": 3,
+      "y": 0.6,
+      "width": 3,
+      "height": 0.1
+    },
+    {
+      "x": -2.5,
+      "y": -0.1,
+      "width": 1,
+      "height": 0.1
+    }
+  ],
+  "objects": [
+    {
+      "prefab": "table",
+      "x": 1,
+      "y": 0
+    }
+  ]
+}
