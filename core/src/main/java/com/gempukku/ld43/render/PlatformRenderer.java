@@ -1,6 +1,8 @@
 package com.gempukku.ld43.render;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gempukku.ld43.model.GameScreenComponent;
@@ -12,7 +14,6 @@ import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.index.EntityIndex;
 import com.gempukku.secsy.entity.index.EntityIndexManager;
-import com.gempukku.secsy.gaming.asset.texture.TextureAtlasProvider;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 
@@ -20,9 +21,8 @@ import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 public class PlatformRenderer extends AbstractLifeCycleSystem {
     @Inject
     private EntityIndexManager entityIndexManager;
-    @Inject
-    private TextureAtlasProvider textureAtlasProvider;
 
+    private Texture texture;
     private SpriteBatch spriteBatch;
 
     private EntityIndex platformEntities;
@@ -32,6 +32,9 @@ public class PlatformRenderer extends AbstractLifeCycleSystem {
         spriteBatch = new SpriteBatch();
 
         platformEntities = entityIndexManager.addIndexOnComponents(PlatformComponent.class);
+
+        texture = new Texture(Gdx.files.internal("images/floor.png"));
+        texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
     }
 
     @ReceiveEvent
@@ -49,19 +52,21 @@ public class PlatformRenderer extends AbstractLifeCycleSystem {
     }
 
     private void renderPlatforms() {
-        TextureRegion floor = textureAtlasProvider.getTexture("sprites", "images/floor.png");
-
         for (EntityRef platformEntity : platformEntities) {
             Position2DComponent position = platformEntity.getComponent(Position2DComponent.class);
             PlatformComponent platform = platformEntity.getComponent(PlatformComponent.class);
+            float width = platform.getRight() - platform.getLeft();
+            float height = platform.getUp() - platform.getDown();
+            TextureRegion floor = new TextureRegion(texture, 0, 0, width / height, 1);
             spriteBatch.draw(floor, position.getX() + platform.getLeft(), position.getY() + platform.getDown(),
-                    platform.getRight() - platform.getLeft(), platform.getUp() - platform.getDown());
+                    width, height);
         }
 
     }
 
     @Override
     public void destroy() {
+        texture.dispose();
         spriteBatch.dispose();
     }
 }
