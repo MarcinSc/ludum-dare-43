@@ -37,6 +37,7 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         JSONObject exitObject = (JSONObject) level.get("exit");
         JSONArray enemyArray = (JSONArray) level.get("enemies");
         JSONArray platformArray = (JSONArray) level.get("platforms");
+        JSONArray objectArray = (JSONArray) level.get("objects");
 
         createPlayer(getFloat(playerObject, "x"), getFloat(playerObject, "y"));
         createExit(getFloat(exitObject, "x"), getFloat(exitObject, "y"));
@@ -49,6 +50,18 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
             createPlatform(getFloat(platformObj, "x"), getFloat(platformObj, "y"),
                     getFloat(platformObj, "width"), getFloat(platformObj, "height"));
         }
+        for (Object object : objectArray) {
+            JSONObject objectObj = (JSONObject) object;
+            createEntityAtPosition((String) objectObj.get("prefab"), getFloat(objectObj, "x"), getFloat(objectObj, "y"));
+        }
+    }
+
+    private void createEntityAtPosition(String prefab, float x, float y) {
+        EntityRef entity = entityManager.createEntityFromPrefab(prefab);
+        Position2DComponent position = entity.getComponent(Position2DComponent.class);
+        position.setX(x);
+        position.setY(y);
+        entity.saveChanges();
     }
 
     private JSONObject loadJSON(String levelFile) {
@@ -71,27 +84,15 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
     }
 
     private void createExit(float x, float y) {
-        EntityRef levelExit = entityManager.createEntityFromPrefab("levelExit");
-        Position2DComponent position = levelExit.getComponent(Position2DComponent.class);
-        position.setX(x);
-        position.setY(y);
-        levelExit.saveChanges();
+        createEntityAtPosition("levelExit", x, y);
     }
 
     private void createEnemy(String prefab, float x, float y) {
-        EntityRef enemy = entityManager.createEntityFromPrefab(prefab);
-        Position2DComponent position = enemy.getComponent(Position2DComponent.class);
-        position.setX(x);
-        position.setY(y);
-        enemy.saveChanges();
+        createEntityAtPosition(prefab, x, y);
     }
 
     private void createPlayer(float x, float y) {
-        EntityRef playerEntity = entityManager.createEntityFromPrefab("playerEntity");
-        Position2DComponent position = playerEntity.getComponent(Position2DComponent.class);
-        position.setX(x);
-        position.setY(y);
-        playerEntity.saveChanges();
+        createEntityAtPosition("playerEntity", x, y);
     }
 
     private void createPlatform(float x, float y, float width, float height) {

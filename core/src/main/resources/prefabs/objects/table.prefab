@@ -1,0 +1,9 @@
+{
+  "Position2D": {},
+  "Sprite": {
+    "fileName": "images/table.png",
+    "left": -0.15,
+    "right": 0.15,
+    "up": 0.1
+  }
+}
