@@ -14,7 +14,7 @@ public class LevelSystem {
     public void levelComplete(SensorContactBegin sensorContactBegin, EntityRef entity, PlayerComponent player) {
         if (sensorContactBegin.getSensorType().equals("completionSensor")
                 && sensorContactBegin.getSensorTrigger().hasComponent(CompletionComponent.class)) {
-            entity.send(new RenderText("And at the end of the day he will come home and tell me how tired he is...", 3000));
+            entity.send(new RenderText("And at the end of the day he will come home\nand tell me how tired he is...", 3000));
         }
     }
 }
