@@ -1,5 +1,6 @@
 package com.gempukku.ld43.provider;
 
+import com.gempukku.ld43.splash.GoToMenu;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -7,7 +8,6 @@ import com.gempukku.secsy.entity.EntityManager;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.rendering.pipeline.CameraEntityProvider;
-import com.gempukku.secsy.gaming.rendering.splash.SplashSeriesEnded;
 
 @RegisterSystem(shared = CameraEntityProvider.class)
 public class CameraEntityProviderImpl extends AbstractLifeCycleSystem implements CameraEntityProvider {
@@ -28,7 +28,7 @@ public class CameraEntityProviderImpl extends AbstractLifeCycleSystem implements
     }
 
     @ReceiveEvent
-    public void switchToMainMenu(SplashSeriesEnded splashSeriesEnded) {
+    public void switchToMainMenu(GoToMenu goToMenu) {
         currentCamera = menuCameraEntity;
     }
 
