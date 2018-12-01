@@ -22,10 +22,22 @@ public class PriorityCollection<T> implements Iterable<T> {
         multimap.put(priority, t);
     }
 
+    public void put(T t, float priority) {
+        multimap.put(priority, t);
+    }
+
     public void remove(T t) {
         float priority = getItemPriority(t);
 
         multimap.remove(priority, t);
+    }
+
+    public void remove(T t, float priority) {
+        multimap.remove(priority, t);
+    }
+
+    public void clear() {
+        multimap.clear();
     }
 
     private float getItemPriority(T t) {

@@ -8,11 +8,6 @@
     "y": 0.7
   },
   "enemies": [
-    {
-      "type": "patrollingEnemy",
-      "x": 2,
-      "y": 0
-    }
   ],
   "platforms": [
     {
