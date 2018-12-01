@@ -2,6 +2,7 @@ package com.gempukku.ld43.level;
 
 import com.gempukku.ld43.model.CompletionComponent;
 import com.gempukku.ld43.model.PlayerComponent;
+import com.gempukku.ld43.render.RenderText;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
@@ -13,7 +14,7 @@ public class LevelSystem {
     public void levelComplete(SensorContactBegin sensorContactBegin, EntityRef entity, PlayerComponent player) {
         if (sensorContactBegin.getSensorType().equals("completionSensor")
                 && sensorContactBegin.getSensorTrigger().hasComponent(CompletionComponent.class)) {
-            System.out.println("Level completed");
+            entity.send(new RenderText("And at the end of the day he will come home and tell me how tired he is...", 3000));
         }
     }
 }

@@ -36,7 +36,7 @@ public class LevelRenderSystem extends AbstractLifeCycleSystem {
     }
 
     @ReceiveEvent
-    public void renderToPipeline(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreenComponent) {
+    public void renderToPipeline(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
         renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
 
         shapeRenderer.setProjectionMatrix(renderToPipeline.getCamera().combined);
