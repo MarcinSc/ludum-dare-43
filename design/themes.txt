@@ -36,8 +36,8 @@ angels only move, when player moves and/or turn, that will give player time to t
 
 7. Sacrifices must be made
 - Player disembowels sacrificial animals to create items.
-- Tribe, controlled by player, has to sacrifice animals/enemies to appease Gods and receive blessings. If sacrifices are
-not made, Gods get angry and destroy player's progress/kill tribesmen.
+- Tribe, controlled by player, has to sacrifice animals/enemies to appease gods and receive blessings. If sacrifices are
+not made, gods get angry and destroy player's progress/kill tribesmen.
 
 8. Absorb your enemies
 - This could be just a simple adventure game, where you can absorb enemies' energy to regain health/mana, but also maybe
