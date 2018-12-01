@@ -5,6 +5,8 @@
   "SensorTrigger": {},
   "Platform": {},
   "DustLayer": {
-    "dustGrowthPerSecond": 0.1
+    "dustGrowthPerSecond": 0.3,
+    "dustColor": "0,0,0",
+    "spawnedEntity": "dustBunny"
   }
 }

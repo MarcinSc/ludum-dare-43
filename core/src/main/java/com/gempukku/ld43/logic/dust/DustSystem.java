@@ -1,6 +1,7 @@
 package com.gempukku.ld43.logic.dust;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.gempukku.ld43.logic.spawn.SpawnEntity;
 import com.gempukku.ld43.model.DustLayerComponent;
 import com.gempukku.ld43.model.LevelBuilder;
 import com.gempukku.ld43.model.SweeperComponent;
@@ -20,6 +21,8 @@ import com.gempukku.secsy.gaming.time.TimeManager;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Random;
 
 @RegisterSystem
 public class DustSystem extends AbstractLifeCycleSystem {
@@ -31,6 +34,7 @@ public class DustSystem extends AbstractLifeCycleSystem {
     private Basic2dPhysics basic2dPhysics;
 
     private EntityIndex dustLayerEntities;
+    private Random rnd = new Random();
 
     @Override
     public void initialize() {
@@ -44,12 +48,34 @@ public class DustSystem extends AbstractLifeCycleSystem {
             DustLayerComponent dustLayer = dustLayerEntity.getComponent(DustLayerComponent.class);
             float dustGrowthPerSecond = dustLayer.getDustGrowthPerSecond();
             float[] layerDepth = dustLayer.getLayerDepth();
-            for (int i = 0; i < layerDepth.length; i++) {
-                layerDepth[i] = Math.min(1f, layerDepth[i] + dustGrowthPerSecond * seconds);
+
+            int spawnedIndex = findSpawnedIndex(layerDepth);
+            if (spawnedIndex != -1) {
+                float width = dustLayer.getRight() - dustLayer.getLeft();
+                Position2DComponent position = dustLayerEntity.getComponent(Position2DComponent.class);
+                float x = position.getX() + dustLayer.getLeft() + (spawnedIndex + 0.5f) * width / layerDepth.length;
+                float y = position.getY() + dustLayer.getDown();
+
+                Arrays.fill(layerDepth, spawnedIndex - 2, spawnedIndex + 3, 0);
+                dustLayerEntity.send(new SpawnEntity(dustLayer.getSpawnedEntity(), x, y));
+            } else {
+                for (int i = 0; i < layerDepth.length; i++) {
+                    float growth = dustGrowthPerSecond * seconds * rnd.nextFloat();
+                    layerDepth[i] = Math.min(1f, layerDepth[i] + growth);
+                }
             }
             dustLayer.setLayerDepth(layerDepth);
             dustLayerEntity.saveChanges();
         }
+    }
+
+    private int findSpawnedIndex(float[] layerDepth) {
+        for (int i = 2; i < layerDepth.length - 3; i++) {
+            if (layerDepth[i - 2] == 1 && layerDepth[i - 1] == 1 && layerDepth[i] == 1
+                    && layerDepth[i + 1] == 1 && layerDepth[i + 2] == 1)
+                return i;
+        }
+        return -1;
     }
 
     @ReceiveEvent
