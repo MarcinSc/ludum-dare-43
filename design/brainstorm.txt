@@ -13,3 +13,19 @@ Probably has to be 3d...
 energy, that regenerates when the tribe makes sacrifices to the god.
 
 Probably has to be 3d...
+
+- Player is playing a mom, that is raising a child, doing chores, etc. while doing so, it speaks of how she chose to
+sacrifice her career for this.
+
+Maybe instead of doing chores, she fights monsters (platformer) made of dirty clothes, kitchen utensils/food, the end
+goal is reaching a child at the end of the level.
+
+When player dies, a screen goes to black and voice over, or text is shown: "You've been at home all day, and you did not
+even clean the house?"
+
+Sample quotes (spoken when a monster is killed):
+- I did not go to college for that...
+- And at the end of the day he will come home and tell me how tired he is...
+
+Game title: "MOM"
+Subtitle: "Sacrifices must(?) be made!"

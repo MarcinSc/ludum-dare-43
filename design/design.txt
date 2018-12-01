@@ -1,0 +1,15 @@
+Game title: "MOM"
+Subtitle: "Sacrifices must(?) be made!"
+
+General design:
+2d platformer, player takes control of a Mom, that fights monsters made of dirty clothes, kitchen utensils, etc. to
+reach the level's goal - a small child, possibly sleeping in a cot.
+
+Ideas:
+1. When player dies, a screen goes to black and voice over, or text is shown: "You've been home all day, and you did not
+even clean the house?"
+2. When player kills a monster, a quote is shown at the bottom of the screen.
+
+Sample quotes (spoken when a monster is killed):
+- I did not go to college for that...
+- And at the end of the day he will come home and tell me how tired he is...
