@@ -1,4 +1,4 @@
-package com.gempukku.ld43.damage;
+package com.gempukku.ld43.logic.damage;
 
 import com.gempukku.ld43.model.PlayerComponent;
 import com.gempukku.ld43.render.RenderText;

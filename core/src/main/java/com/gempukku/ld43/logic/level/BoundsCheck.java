@@ -1,4 +1,4 @@
-package com.gempukku.ld43.level;
+package com.gempukku.ld43.logic.level;
 
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.entity.EntityRef;

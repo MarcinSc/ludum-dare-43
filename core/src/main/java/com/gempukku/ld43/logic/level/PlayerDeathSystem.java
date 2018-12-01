@@ -1,6 +1,6 @@
-package com.gempukku.ld43.level;
+package com.gempukku.ld43.logic.level;
 
-import com.gempukku.ld43.damage.EntityDamaged;
+import com.gempukku.ld43.logic.damage.EntityDamaged;
 import com.gempukku.ld43.model.PlayerComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
