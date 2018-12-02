@@ -54,7 +54,7 @@
   "ControlledByInput": {
     "jumpSpeed": 3,
     "moveSpeed": 1,
-    "jumpMaxCount": 2
+    "jumpMaxCount": 1
   },
   "Vulnerable": {},
   "Sprite": {
