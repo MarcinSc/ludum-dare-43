@@ -436,6 +436,7 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         SensorComponent sensorComp = entity.getComponent(SensorComponent.class);
         Map<String, Sensor> sensorMap = new HashMap<String, Sensor>();
         for (Sensor sensor : sensorComp.getSensors()) {
+            sensor = new Sensor(sensor);
             sensor.entityId = entityId;
             sensorMap.put(sensor.type, sensor);
         }

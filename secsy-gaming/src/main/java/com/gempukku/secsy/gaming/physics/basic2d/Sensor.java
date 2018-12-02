@@ -15,4 +15,12 @@ public class Sensor {
         this.down = down;
         this.up = up;
     }
+
+    public Sensor(Sensor sensor) {
+        this.type = sensor.type;
+        this.left = sensor.left;
+        this.right = sensor.right;
+        this.down = sensor.down;
+        this.up = sensor.up;
+    }
 }

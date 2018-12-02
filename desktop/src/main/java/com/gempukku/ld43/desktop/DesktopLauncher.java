@@ -35,6 +35,7 @@ public class DesktopLauncher {
         activeProfiles.add("basic2dPhysics");
         activeProfiles.add("grainPostProcessor");
         activeProfiles.add("backgroundMusic");
+        activeProfiles.add("ai");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.fullscreen = true;
