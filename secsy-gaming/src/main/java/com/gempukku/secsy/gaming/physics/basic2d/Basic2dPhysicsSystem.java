@@ -5,6 +5,7 @@ import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.*;
+import com.gempukku.secsy.entity.event.Event;
 import com.gempukku.secsy.entity.index.EntityIndex;
 import com.gempukku.secsy.entity.index.EntityIndexManager;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
@@ -119,6 +120,8 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
     private void processSensors() {
         Multimap<Sensor, SensorTrigger> newContacts = HashMultimap.create();
 
+        Multimap<EntityRef, Event> eventsToSend = HashMultimap.create();
+
         for (Map.Entry<Integer, Map<String, Sensor>> sensorMap : sensors.entrySet()) {
             int entityId = sensorMap.getKey();
             EntityRef sensorEntity = internalEntityManager.getEntityById(entityId);
@@ -130,7 +133,7 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
                     if (hasContact(sensor, x, y, sensorTrigger)) {
                         if (!existingSensorContacts.containsEntry(sensor, sensorTrigger)) {
                             EntityRef sensorTriggerEntity = internalEntityManager.getEntityById(sensorTrigger.entityId);
-                            sensorEntity.send(new SensorContactBegin(sensor.type, sensorTriggerEntity));
+                            eventsToSend.put(sensorEntity, new SensorContactBegin(sensor.type, sensorTriggerEntity));
                         }
                         newContacts.put(sensor, sensorTrigger);
                     }
@@ -145,12 +148,16 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
                 EntityRef sensorEntity = internalEntityManager.getEntityById(sensor.entityId);
                 if (sensorEntity != null) {
                     EntityRef sensorTriggerEntity = internalEntityManager.getEntityById(sensorTrigger.entityId);
-                    sensorEntity.send(new SensorContactEnd(sensor.type, sensorTriggerEntity));
+                    eventsToSend.put(sensorEntity, new SensorContactEnd(sensor.type, sensorTriggerEntity));
                 }
             }
         }
 
         existingSensorContacts = newContacts;
+
+        for (Map.Entry<EntityRef, Event> eventEntry : eventsToSend.entries()) {
+            eventEntry.getKey().send(eventEntry.getValue());
+        }
     }
 
     private boolean hasContact(Sensor sensor, float x, float y, SensorTrigger sensorTrigger) {

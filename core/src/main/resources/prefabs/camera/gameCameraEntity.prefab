@@ -13,5 +13,9 @@
   "LerpCamera": {
     "xProgress": 2,
     "yProgress": 2
+  },
+  "ColorTint": {
+    "color": "0,0,0",
+    "factor": 1
   }
 }

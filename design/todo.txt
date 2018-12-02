@@ -3,3 +3,5 @@ TODO:
 - Dust bunny killing (stomping on it).
 
 Done:
+- Proper loading of levels.
+- When player dies, level get restarted.

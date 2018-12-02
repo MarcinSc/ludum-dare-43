@@ -1,5 +1,6 @@
 package com.gempukku.ld43.provider;
 
+import com.gempukku.ld43.logic.level.GameStarted;
 import com.gempukku.ld43.menu.GoToGame;
 import com.gempukku.ld43.menu.GoToMenu;
 import com.gempukku.secsy.context.annotation.Inject;
@@ -34,6 +35,7 @@ public class GameEntityProviderImpl extends AbstractLifeCycleSystem implements G
     public void switchToGame(GoToGame goToGame) {
         entityManager.destroyEntity(currentGameLoopEntity);
         currentGameLoopEntity = entityManager.createEntityFromPrefab("gameGameEntity");
+        currentGameLoopEntity.send(new GameStarted());
     }
 
     @Override

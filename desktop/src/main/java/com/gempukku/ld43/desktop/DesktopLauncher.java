@@ -36,6 +36,8 @@ public class DesktopLauncher {
         activeProfiles.add("grainPostProcessor");
         activeProfiles.add("backgroundMusic");
         activeProfiles.add("ai");
+        activeProfiles.add("delayActions");
+        activeProfiles.add("colorTint");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.fullscreen = true;
