@@ -1,6 +1,7 @@
 package com.gempukku.ld43.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,29 +18,117 @@ import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.game.GameEntityProvider;
+import com.gempukku.secsy.gaming.audio.AudioManager;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 
 @RegisterSystem
 public class MenuScreenSystem extends AbstractLifeCycleSystem {
     @Inject
     private GameEntityProvider gameEntityProvider;
+    @Inject
+    private AudioManager audioManager;
 
     private Texture butterfly;
-    private Stage stage;
+    private Sound sampleSound;
+
+    private Stage menuStage;
+    private Stage settingsStage;
+
     private Skin skin;
     private boolean debug = false;
+
+    private Stage currentStage;
 
     @Override
     public void initialize() {
         createSkin();
 
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        createMenuStage();
+        createSettingsStage();
+
+        setCurrentStage(menuStage);
+    }
+
+    private void createSettingsStage() {
+        sampleSound = Gdx.audio.newSound(Gdx.files.internal("sounds/jump.wav"));
+
+        settingsStage = new Stage();
 
         Table table = new Table(skin);
         table.setDebug(debug);
         table.setFillParent(true);
-        stage.addActor(table);
+
+        final Label masterLabel = new Label("Master volume", skin, "subtitle");
+        table.add(masterLabel);
+        table.row();
+
+        final Slider masterSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        masterSlider.setValue(0.05f);
+        masterSlider.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        audioManager.setMasterVolume(masterSlider.getValue());
+                    }
+                });
+        table.add(masterSlider).width(300);
+        table.row();
+
+        Label musicLabel = new Label("Music volume", skin, "subtitle");
+        table.add(musicLabel);
+        table.row();
+
+        final Slider musicSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        musicSlider.setValue(1f);
+        musicSlider.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        audioManager.setMusicVolume(musicSlider.getValue());
+                    }
+                });
+        table.add(musicSlider).width(300);
+        table.row();
+
+        Label fxLabel = new Label("FX volume", skin, "subtitle");
+        table.add(fxLabel);
+        table.row();
+
+        final Slider fxSlider = new Slider(0f, 1f, 0.01f, false, skin);
+        fxSlider.setValue(1f);
+        fxSlider.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        audioManager.setFXVolume(fxSlider.getValue());
+                        audioManager.playSound(sampleSound);
+                    }
+                });
+        table.add(fxSlider).width(300);
+        table.row();
+
+        final TextButton backButton = new TextButton("Back to menu", skin);
+        backButton.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (backButton.isChecked())
+                            setCurrentStage(menuStage);
+                    }
+                });
+        table.add(backButton).height(70).width(400).pad(10);
+        table.row();
+
+        settingsStage.addActor(table);
+    }
+
+    private void createMenuStage() {
+        menuStage = new Stage();
+
+        Table table = new Table(skin);
+        table.setDebug(debug);
+        table.setFillParent(true);
+        menuStage.addActor(table);
 
         final TextButton newGameButton = new TextButton("New game", skin);
         newGameButton.addListener(
@@ -48,6 +137,15 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
                     public void changed(ChangeEvent event, Actor actor) {
                         if (newGameButton.isChecked())
                             gameEntityProvider.getGameEntity().send(new GoToGame());
+                    }
+                });
+        final TextButton settingsButton = new TextButton("Settings", skin);
+        settingsButton.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (settingsButton.isChecked())
+                            setCurrentStage(settingsStage);
                     }
                 });
         final TextButton exitButton = new TextButton("Exit", skin);
@@ -81,16 +179,26 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
 
         middleTable.add(newGameButton).height(70).width(300).pad(10);
         middleTable.row();
+        middleTable.add(settingsButton).height(70).width(300).pad(10);
+        middleTable.row();
         middleTable.add(exitButton).height(70).width(300).pad(10);
+        middleTable.row();
 
         Label dedicationLabel = new Label("For all the moms out there", skin, "dedication");
         table.add(dedicationLabel).colspan(2).pad(10).height(60);
         table.row();
+
+        Label aboutLabel = new Label("Created with LibGDX for Ludum Dare 43", skin, "dedication");
+        table.add(aboutLabel).colspan(2).pad(10).height(60);
+        table.row();
+    }
+
+    private void setCurrentStage(Stage stage) {
+        currentStage = stage;
+        Gdx.input.setInputProcessor(currentStage);
     }
 
     private void createSkin() {
-
-        // Title font
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Kindergarden.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 150;
@@ -115,20 +223,22 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
 
     @ReceiveEvent
     public void renderMenu(RenderToPipeline renderToPipeline, EntityRef camera, MenuScreenComponent menuScreen) {
-        stage.getViewport().update(renderToPipeline.getWidth(), renderToPipeline.getHeight(), true);
+        currentStage.getViewport().update(renderToPipeline.getWidth(), renderToPipeline.getHeight(), true);
 
-        stage.act();
+        currentStage.act();
         renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
         // baby blue: b6e0f0
         Gdx.gl.glClearColor(0xb6 / 255f, 0xe0 / 255f, 0xf0 / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        stage.draw();
+        currentStage.draw();
         renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
     }
 
     @Override
     public void destroy() {
+        sampleSound.dispose();
         skin.dispose();
-        stage.dispose();
+        settingsStage.dispose();
+        menuStage.dispose();
     }
 }
