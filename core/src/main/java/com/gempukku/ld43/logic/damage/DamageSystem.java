@@ -46,16 +46,19 @@ public class DamageSystem extends AbstractLifeCycleSystem {
     @ReceiveEvent
     public void stompTrigger(SensorContactBegin sensorContactBegin, EntityRef sensorEntity, PlayerComponent player) {
         if (sensorContactBegin.getSensorType().equals("stompSensor")) {
-            EntityRef sensorTrigger = sensorContactBegin.getSensorTrigger();
-            if (sensorTrigger.hasComponent(DustBunnyComponent.class)) {
-                sensorTrigger.send(new EntityDamaged(sensorEntity));
-                MovingComponent moving = sensorEntity.getComponent(MovingComponent.class);
-                moving.setSpeedY(3);
-                sensorEntity.saveChanges();
+            float speedY = sensorEntity.getComponent(MovingComponent.class).getSpeedY();
+            if (speedY < 0) {
+                EntityRef sensorTrigger = sensorContactBegin.getSensorTrigger();
+                if (sensorTrigger.hasComponent(DustBunnyComponent.class)) {
+                    sensorTrigger.send(new EntityDamaged(sensorEntity));
+                    MovingComponent moving = sensorEntity.getComponent(MovingComponent.class);
+                    moving.setSpeedY(3);
+                    sensorEntity.saveChanges();
 
-                audioManager.playSound(stomp);
+                    audioManager.playSound(stomp);
 
-                sensorEntity.send(new RenderText(stompTexts[new Random().nextInt(stompTexts.length)], 3000));
+                    sensorEntity.send(new RenderText(stompTexts[new Random().nextInt(stompTexts.length)], 3000));
+                }
             }
         }
     }
