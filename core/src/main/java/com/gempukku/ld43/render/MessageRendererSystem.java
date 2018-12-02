@@ -46,7 +46,7 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
         int screenHeight = renderToPipeline.getHeight();
         int screenWidth = renderToPipeline.getWidth();
 
-        int fontSize = screenHeight / 20;
+        int fontSize = screenHeight / 15;
         if (messageFont == null) {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/IMMORTAL.ttf"));
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -61,7 +61,7 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
             float color = easingResolver.resolveValue("pow5,0-1-0", 1f * (time - textStartTime) / textDuration);
             messageFont.setColor(0, 0, 0, color);
             spriteBatch.begin();
-            messageFont.draw(spriteBatch, text, 0, screenHeight / 9, screenWidth, Align.center, true);
+            messageFont.draw(spriteBatch, text, 0, screenHeight / 7, screenWidth, Align.center, true);
             spriteBatch.end();
             renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
         }
