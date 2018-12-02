@@ -42,7 +42,7 @@ public class BackgroundMusicSystem extends AbstractLifeCycleSystem {
                 music.setLooping(backgroundMusicDefinition.isLooping());
             }
             if (!audioManager.isBackgroundMusic(music))
-                audioManager.setBackgroundMusic(music, 1000);
+                audioManager.setBackgroundMusic(music, backgroundMusicDefinition.getFadeInDuration());
         }
     }
 

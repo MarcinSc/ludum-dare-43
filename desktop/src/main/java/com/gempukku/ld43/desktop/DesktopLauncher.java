@@ -33,6 +33,8 @@ public class DesktopLauncher {
         activeProfiles.add("2dCamera");
         activeProfiles.add("platformer2dMovement");
         activeProfiles.add("basic2dPhysics");
+        activeProfiles.add("grainPostProcessor");
+        activeProfiles.add("backgroundMusic");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.fullscreen = true;
