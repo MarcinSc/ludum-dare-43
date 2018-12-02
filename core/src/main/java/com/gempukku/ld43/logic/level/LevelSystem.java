@@ -211,7 +211,7 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         DustLayerComponent dustLayer = platformEntity.getComponent(DustLayerComponent.class);
         if (dustLayer != null) {
             dustLayer.setRight(width);
-            dustLayer.setUp(height * 2);
+            dustLayer.setUp(height * 3);
             dustLayer.setDown(height);
             float[] layerDepth = new float[MathUtils.floor(width * PILE_COUNT_PER_METER)];
             dustLayer.setLayerDepth(layerDepth);
