@@ -1,5 +1,4 @@
 TODO:
-- Introduce broom.
 - Introduce other enemy types.
 - Improve rendering of dust bunnies based on alpha texture.
 
@@ -13,3 +12,4 @@ Done:
 - Stomp only when player is going down.
 - Displaying tutorial text.
 - Tutorial about dust and sweeping.
+- Introduce broom.
