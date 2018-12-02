@@ -27,7 +27,6 @@ public class SplashScreenSystem {
 
     @ReceiveEvent
     public void splashSeriesEnded(SplashSeriesEnded splashSeriesEnded, EntityRef cameraEntity) {
-        System.out.println(timeManager.getTime() + ": Splash series ended");
         cameraEntity.removeComponents(SplashSeriesComponent.class);
 
         GrainComponent grain = cameraEntity.createComponent(GrainComponent.class);

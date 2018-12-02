@@ -12,5 +12,7 @@
       }
     ]
   },
-  "Level": {}
+  "Level": {
+    "levelIndex": 2
+  }
 }

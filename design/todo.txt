@@ -1,7 +1,9 @@
 TODO:
-- Screen shake, when Mom lands on a platform.
-- Dust bunny killing (stomping on it).
+- Camera zoom adjusting based on screen height.
+- Better ClampCamera implementation (based on visible space).
 
 Done:
 - Proper loading of levels.
 - When player dies, level get restarted.
+- Screen shake, when Mom lands on a platform.
+- Dust bunny killing (stomping on it).

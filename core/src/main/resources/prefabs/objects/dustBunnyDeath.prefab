@@ -1,0 +1,8 @@
+{
+  "Position2D": {},
+  "ParticleEffect": {
+    "path": "particles/dustBunnyExplosion.p",
+    "destroyOnEffectEnd": true,
+    "color": "255,0,0"
+  }
+}

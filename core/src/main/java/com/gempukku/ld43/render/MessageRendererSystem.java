@@ -1,6 +1,7 @@
 package com.gempukku.ld43.render;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -41,7 +42,7 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
         textDuration = renderText.getDuration();
     }
 
-    @ReceiveEvent(priority = -1)
+    @ReceiveEvent(priority = -10)
     public void renderToPipeline(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
         int screenHeight = renderToPipeline.getHeight();
         int screenWidth = renderToPipeline.getWidth();
@@ -51,6 +52,8 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/IMMORTAL.ttf"));
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
             parameter.size = fontSize;
+            parameter.borderWidth = screenHeight / 200;
+            parameter.borderColor = Color.BLACK;
             messageFont = generator.generateFont(parameter);
             generator.dispose();
         }
@@ -59,7 +62,7 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
         if (textStartTime <= time && time < textStartTime + textDuration) {
             renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
             float color = easingResolver.resolveValue("pow5,0-1-0", 1f * (time - textStartTime) / textDuration);
-            messageFont.setColor(0, 0, 0, color);
+            messageFont.setColor(1, 1, 1, color);
             spriteBatch.begin();
             messageFont.draw(spriteBatch, text, 0, screenHeight / 7, screenWidth, Align.center, true);
             spriteBatch.end();
