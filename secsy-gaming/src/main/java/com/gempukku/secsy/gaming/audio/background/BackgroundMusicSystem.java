@@ -37,12 +37,14 @@ public class BackgroundMusicSystem extends AbstractLifeCycleSystem {
             List<BackgroundMusicDefinition> backgroundMusicDefinitions = backgroundMusic.getBackgroundMusicDefinitions();
             BackgroundMusicDefinition backgroundMusicDefinition = getBackgroundMusicDefinition(backgroundMusicDefinitions, time - startTime);
             Music music = null;
+            long fadein = 1000;
             if (backgroundMusicDefinition != null) {
                 music = getMusic(backgroundMusicDefinition.getPath());
                 music.setLooping(backgroundMusicDefinition.isLooping());
+                fadein = backgroundMusicDefinition.getFadeInDuration();
             }
             if (!audioManager.isBackgroundMusic(music))
-                audioManager.setBackgroundMusic(music, backgroundMusicDefinition.getFadeInDuration());
+                audioManager.setBackgroundMusic(music, fadein);
         }
     }
 

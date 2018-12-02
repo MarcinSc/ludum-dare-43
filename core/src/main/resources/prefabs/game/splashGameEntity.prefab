@@ -1,4 +1,5 @@
 {
+  "GlobalEntity": {},
   "BackgroundMusic": {
     "startTime": 2000,
     "backgroundMusicDefinitions": [
@@ -7,12 +8,6 @@
         "looping": false,
         "duration": 2000,
         "fadeInDuration": 100
-      },
-      {
-        "path": "sounds/background.wav",
-        "looping": true,
-        "duration": -1,
-        "fadeInDuration": 1000
       }
     ]
   }

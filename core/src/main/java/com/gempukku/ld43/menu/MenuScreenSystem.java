@@ -9,9 +9,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -109,11 +111,10 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
 
         final TextButton backButton = new TextButton("Back to menu", skin);
         backButton.addListener(
-                new ChangeListener() {
+                new ClickListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        if (backButton.isChecked())
-                            setCurrentStage(menuStage);
+                    public void clicked(InputEvent event, float x, float y) {
+                        setCurrentStage(menuStage);
                     }
                 });
         table.add(backButton).height(70).width(400).pad(10);
@@ -132,33 +133,30 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
 
         final TextButton newGameButton = new TextButton("New game", skin);
         newGameButton.addListener(
-                new ChangeListener() {
+                new ClickListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        if (newGameButton.isChecked())
+                    public void clicked(InputEvent event, float x, float y) {
                             gameEntityProvider.getGameEntity().send(new GoToGame());
                     }
                 });
         final TextButton settingsButton = new TextButton("Settings", skin);
         settingsButton.addListener(
-                new ChangeListener() {
+                new ClickListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        if (settingsButton.isChecked())
+                    public void clicked(InputEvent event, float x, float y) {
                             setCurrentStage(settingsStage);
                     }
                 });
         final TextButton exitButton = new TextButton("Exit", skin);
         exitButton.addListener(
-                new ChangeListener() {
+                new ClickListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        if (exitButton.isChecked())
+                    public void clicked(InputEvent event, float x, float y) {
                             Gdx.app.exit();
                     }
                 });
 
-        Label titleLabel = new Label("MOM", skin, "title");
+        Label titleLabel = new Label("MOOOM!", skin, "title");
         table.add(titleLabel).colspan(2).pad(10).height(150);
         table.row();
         Label subtitleLabel = new Label("Sacrifices must? be made", skin, "subtitle");
@@ -184,13 +182,18 @@ public class MenuScreenSystem extends AbstractLifeCycleSystem {
         middleTable.add(exitButton).height(70).width(300).pad(10);
         middleTable.row();
 
-        Label dedicationLabel = new Label("For all the moms out there", skin, "dedication");
+        Label dedicationLabel = new Label("For all the mothers out there", skin, "dedication");
         table.add(dedicationLabel).colspan(2).pad(10).height(60);
         table.row();
 
         Label aboutLabel = new Label("Created with LibGDX for Ludum Dare 43", skin, "dedication");
         table.add(aboutLabel).colspan(2).pad(10).height(60);
         table.row();
+    }
+
+    @ReceiveEvent
+    public void goToMenu(GoToMenu goToMenu) {
+        setCurrentStage(menuStage);
     }
 
     private void setCurrentStage(Stage stage) {

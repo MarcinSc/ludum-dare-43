@@ -9,36 +9,36 @@ import com.gempukku.secsy.entity.EntityManager;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.game.GameEntityProvider;
+import com.gempukku.secsy.gaming.time.TimeEntityProvider;
 
-@RegisterSystem(shared = GameEntityProvider.class)
-public class GameEntityProviderImpl extends AbstractLifeCycleSystem implements GameEntityProvider {
+@RegisterSystem(shared = {GameEntityProvider.class, TimeEntityProvider.class})
+public class GameEntityProviderImpl extends AbstractLifeCycleSystem implements GameEntityProvider, TimeEntityProvider {
     @Inject
     private EntityManager entityManager;
-
-    private EntityRef splashGameLoopEntity;
-    private EntityRef menuGameLoopEntity;
-    private EntityRef gameGameLoopEntity;
 
     private EntityRef currentGameLoopEntity;
 
     @Override
     public void initialize() {
-        splashGameLoopEntity = entityManager.createEntityFromPrefab("splashGameEntity");
-        menuGameLoopEntity = entityManager.createEntityFromPrefab("menuGameEntity");
-        gameGameLoopEntity = entityManager.createEntityFromPrefab("gameGameEntity");
-
-        currentGameLoopEntity = splashGameLoopEntity;
+        currentGameLoopEntity = entityManager.createEntityFromPrefab("splashGameEntity");
     }
 
 
-    @ReceiveEvent
+    @ReceiveEvent(priority = -100)
     public void switchToMainMenu(GoToMenu goToMenu) {
-        currentGameLoopEntity = menuGameLoopEntity;
+        entityManager.destroyEntity(currentGameLoopEntity);
+        currentGameLoopEntity = entityManager.createEntityFromPrefab("menuGameEntity");
     }
 
-    @ReceiveEvent
+    @ReceiveEvent(priority = -100)
     public void switchToGame(GoToGame goToGame) {
-        currentGameLoopEntity = gameGameLoopEntity;
+        entityManager.destroyEntity(currentGameLoopEntity);
+        currentGameLoopEntity = entityManager.createEntityFromPrefab("gameGameEntity");
+    }
+
+    @Override
+    public EntityRef getTimeEntity() {
+        return currentGameLoopEntity;
     }
 
     @Override
