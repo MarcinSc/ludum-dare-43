@@ -19,5 +19,8 @@
     }
   ],
   "objects": [
+    {
+      "prefab": "tutorial0"
+    }
   ]
 }

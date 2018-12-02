@@ -30,6 +30,9 @@
       "prefab": "dustBunny",
       "x": 1.4,
       "y": 0
+    },
+    {
+      "prefab": "tutorial2"
     }
   ]
 }

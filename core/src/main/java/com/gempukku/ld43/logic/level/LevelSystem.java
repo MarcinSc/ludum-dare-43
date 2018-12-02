@@ -139,8 +139,15 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         }
         for (Object object : objectArray) {
             JSONObject objectObj = (JSONObject) object;
-            createEntityAtPosition((String) objectObj.get("prefab"), getFloat(objectObj, "x"), getFloat(objectObj, "y"));
+            if (objectObj.containsKey("x"))
+                createEntityAtPosition((String) objectObj.get("prefab"), getFloat(objectObj, "x"), getFloat(objectObj, "y"));
+            else
+                createEntity((String) objectObj.get("prefab"));
         }
+    }
+
+    private void createEntity(String prefab) {
+        entityManager.createEntityFromPrefab(prefab);
     }
 
     private void createEntityAtPosition(String prefab, float x, float y) {

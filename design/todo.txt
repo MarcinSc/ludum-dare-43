@@ -1,4 +1,7 @@
 TODO:
+- Introduce broom.
+- Introduce other enemy types.
+- Improve rendering of dust bunnies based on alpha texture.
 
 Done:
 - Proper loading of levels.
@@ -8,3 +11,5 @@ Done:
 - Camera zoom adjusting based on screen height.
 - Better ClampCamera implementation (based on visible space).
 - Stomp only when player is going down.
+- Displaying tutorial text.
+- Tutorial about dust and sweeping.
