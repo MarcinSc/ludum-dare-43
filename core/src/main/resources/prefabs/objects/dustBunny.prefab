@@ -1,0 +1,15 @@
+{
+  "Position2D": {},
+  "DustBunny": {
+    "left": -0.05,
+    "right": 0.05,
+    "up": 0.1,
+    "color": "255,0,0"
+  },
+  "SensorTrigger": {
+    "left": -0.05,
+    "right": 0.05,
+    "up": 0.1
+  },
+  "CausesVulnerability": {}
+}

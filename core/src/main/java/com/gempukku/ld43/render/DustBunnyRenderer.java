@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
-import com.gempukku.ld43.model.DustLayerComponent;
+import com.gempukku.ld43.model.DustBunnyComponent;
 import com.gempukku.ld43.model.GameScreenComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
@@ -21,13 +21,13 @@ import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 import com.gempukku.secsy.gaming.time.TimeManager;
 
 @RegisterSystem
-public class DustLayerRenderer extends AbstractLifeCycleSystem {
+public class DustBunnyRenderer extends AbstractLifeCycleSystem {
     @Inject
     private EntityIndexManager entityIndexManager;
     @Inject
     private TimeManager timeManager;
 
-    private EntityIndex dustLayerEntities;
+    private EntityIndex dustBunnyEntities;
 
     private ShaderProgram shaderProgram;
     private IndexBufferObject indexBufferObject;
@@ -35,11 +35,11 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
 
     @Override
     public void initialize() {
-        dustLayerEntities = entityIndexManager.addIndexOnComponents(DustLayerComponent.class);
+        dustBunnyEntities = entityIndexManager.addIndexOnComponents(DustBunnyComponent.class);
 
         shaderProgram = new ShaderProgram(
-                Gdx.files.internal("shaders/dustShader.vert"),
-                Gdx.files.internal("shaders/dustShader.frag"));
+                Gdx.files.internal("shaders/dustBunnyShader.vert"),
+                Gdx.files.internal("shaders/dustBunnyShader.frag"));
         if (shaderProgram.isCompiled() == false)
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
@@ -56,8 +56,8 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
         indexBufferObject.setIndices(indices, 0, indices.length);
     }
 
-    @ReceiveEvent(priority = -2)
-    public void renderDustLayers(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
+    @ReceiveEvent(priority = -3)
+    public void renderDustBunnies(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
         float seconds = timeManager.getTime() / 1000f;
 
         Camera camera = renderToPipeline.getCamera();
@@ -73,33 +73,19 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
 
         shaderProgram.setUniformMatrix("u_projTrans", camera.combined);
 
-        for (EntityRef dustLayerEntity : dustLayerEntities) {
-            Position2DComponent position = dustLayerEntity.getComponent(Position2DComponent.class);
-            DustLayerComponent dustLayer = dustLayerEntity.getComponent(DustLayerComponent.class);
-            float[] layerDepth = dustLayer.getLayerDepth();
+        for (EntityRef dustBunnyEntity : dustBunnyEntities) {
+            Position2DComponent position = dustBunnyEntity.getComponent(Position2DComponent.class);
+            DustBunnyComponent dustBunny = dustBunnyEntity.getComponent(DustBunnyComponent.class);
+            float x = position.getX() + dustBunny.getLeft();
+            float y = position.getY() + dustBunny.getDown();
+            float width = dustBunny.getRight() - dustBunny.getLeft();
+            float height = dustBunny.getUp() - dustBunny.getDown();
 
-            float x = position.getX() + dustLayer.getLeft();
-            float y = position.getY() + dustLayer.getDown();
-            float width = dustLayer.getRight() - dustLayer.getLeft();
-            float height = dustLayer.getUp() - dustLayer.getDown();
-
-            shaderProgram.setUniformf("u_dustColor", dustLayer.getDustColor());
+            shaderProgram.setUniformf("u_bunnyColor", dustBunny.getColor());
             shaderProgram.setUniformf("u_time", seconds);
+            shaderProgram.setUniformf("u_coordinates", x, y, width, height);
 
-            float horizontalStep = width / layerDepth.length;
-            float progressStep = width / height / layerDepth.length;
-
-            for (int i = 0; i < layerDepth.length; i++) {
-                shaderProgram.setUniformf("u_coordinates", x + i * horizontalStep, y, horizontalStep, height);
-                shaderProgram.setUniformf("u_platformProgress", i * progressStep, 0, progressStep, 1);
-                float previousDepth = getPreviousDepth(layerDepth, i);
-                float currentDepth = getCurrentDepth(layerDepth, i);
-                float nextDepth = getNextDepth(layerDepth, i);
-                shaderProgram.setUniformf("u_dustDepthPrevious", previousDepth);
-                shaderProgram.setUniformf("u_dustDepthCurrent", currentDepth);
-                shaderProgram.setUniformf("u_dustDepthNext", nextDepth);
-                Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
-            }
+            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
         }
         vertexBufferObject.unbind(shaderProgram);
         indexBufferObject.unbind();
@@ -114,7 +100,7 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
     private float getNextDepth(float[] layerDepth, int i) {
         if (i == layerDepth.length - 1)
             return 0;
-        return (layerDepth[i + 1] + layerDepth[i]) / 2;
+        return layerDepth[i + 1];
     }
 
     private float getCurrentDepth(float[] layerDepth, int i) {
@@ -124,7 +110,7 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
     private float getPreviousDepth(float[] layerDepth, int i) {
         if (i == 0)
             return 0;
-        return (layerDepth[i - 1] + layerDepth[i]) / 2;
+        return layerDepth[i - 1];
     }
 
     @Override
