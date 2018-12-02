@@ -11,18 +11,21 @@
   ],
   "platforms": [
     {
+      "type": "platform",
       "x": 0,
       "y": -0.1,
       "width": 3,
       "height": 0.1
     },
     {
+      "type": "dustyPlatform",
       "x": 3,
       "y": 0.6,
       "width": 3,
       "height": 0.1
     },
     {
+      "type": "dustyPlatform",
       "x": -2.5,
       "y": -0.1,
       "width": 1,

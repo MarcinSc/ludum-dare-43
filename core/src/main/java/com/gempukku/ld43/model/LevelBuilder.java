@@ -2,6 +2,7 @@ package com.gempukku.ld43.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 import com.gempukku.ld43.menu.GoToGame;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
@@ -23,6 +24,7 @@ import java.io.Reader;
 
 @RegisterSystem
 public class LevelBuilder extends AbstractLifeCycleSystem {
+    public static final int PILE_COUNT_PER_METER = 10;
     @Inject
     private EntityManager entityManager;
 
@@ -47,7 +49,7 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         }
         for (Object platform : platformArray) {
             JSONObject platformObj = (JSONObject) platform;
-            createPlatform(getFloat(platformObj, "x"), getFloat(platformObj, "y"),
+            createPlatform((String) platformObj.get("type"), getFloat(platformObj, "x"), getFloat(platformObj, "y"),
                     getFloat(platformObj, "width"), getFloat(platformObj, "height"));
         }
         for (Object object : objectArray) {
@@ -95,8 +97,8 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         createEntityAtPosition("playerEntity", x, y);
     }
 
-    private void createPlatform(float x, float y, float width, float height) {
-        EntityRef platformEntity = entityManager.createEntityFromPrefab("platform");
+    private void createPlatform(String type, float x, float y, float width, float height) {
+        EntityRef platformEntity = entityManager.createEntityFromPrefab(type);
 
         Position2DComponent position = platformEntity.getComponent(Position2DComponent.class);
         position.setX(x);
@@ -113,6 +115,15 @@ public class LevelBuilder extends AbstractLifeCycleSystem {
         PlatformComponent platform = platformEntity.getComponent(PlatformComponent.class);
         platform.setRight(width);
         platform.setUp(height);
+
+        DustLayerComponent dustLayer = platformEntity.getComponent(DustLayerComponent.class);
+        if (dustLayer != null) {
+            dustLayer.setRight(width);
+            dustLayer.setUp(height * 2);
+            dustLayer.setDown(height);
+            float[] layerDepth = new float[MathUtils.floor(width * PILE_COUNT_PER_METER)];
+            dustLayer.setLayerDepth(layerDepth);
+        }
 
         platformEntity.saveChanges();
     }
