@@ -1,0 +1,66 @@
+{
+  "player": {
+    "x": 0.1,
+    "y": 0
+  },
+  "exit": {
+    "x": 0,
+    "y": 100
+  },
+  "enemies": [
+  ],
+  "platforms": [
+    {
+      "type": "platform",
+      "x": 0,
+      "y": -0.1,
+      "width": 2,
+      "height": 0.1
+    },
+    {
+      "type": "dustyPlatform",
+      "x": 2.2,
+      "y": 0.3,
+      "width": 2,
+      "height": 0.1
+    },
+    {
+      "type": "jumpingDustyPlatform",
+      "x": 0,
+      "y": 0.7,
+      "width": 2,
+      "height": 0.1
+    },
+    {
+      "type": "jumpingDustyPlatform",
+      "x": 2.2,
+      "y": 1.1,
+      "width": 2,
+      "height": 0.1
+    },
+    {
+      "type": "shootingDustyPlatform",
+      "x": 0,
+      "y": 1.5,
+      "width": 1.8,
+      "height": 0.1
+    }
+  ],
+  "objects": [
+    {
+      "prefab": "table",
+      "x": 0.6,
+      "y": 0
+    },
+    {
+      "prefab": "broom",
+      "x": 2.4,
+      "y": 1.2
+    },
+    {
+      "prefab": "broom",
+      "x": 3.4,
+      "y": 1.2
+    }
+  ]
+}

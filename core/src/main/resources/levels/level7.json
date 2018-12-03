@@ -1,0 +1,31 @@
+{
+  "player": {
+    "x": 0.1,
+    "y": 0
+  },
+  "exit": {
+    "x": 1.9,
+    "y": 0
+  },
+  "enemies": [
+  ],
+  "platforms": [
+    {
+      "type": "platform",
+      "x": 0,
+      "y": -0.1,
+      "width": 2,
+      "height": 0.1
+    }
+  ],
+  "objects": [
+    {
+      "prefab": "tutorial7"
+    },
+    {
+      "prefab": "table",
+      "x": 0.6,
+      "y": 0
+    }
+  ]
+}

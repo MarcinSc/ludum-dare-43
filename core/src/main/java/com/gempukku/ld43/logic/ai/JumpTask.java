@@ -19,7 +19,7 @@ public class JumpTask extends AbstractAITask<EntityRefReference> {
     public AITaskResult startTask(EntityRefReference reference) {
         EntityRef entityRef = reference.getEntityRef();
         MovingComponent moving = entityRef.getComponent(MovingComponent.class);
-        moving.setSpeedY(3);
+        moving.setSpeedY(2);
         entityRef.saveChanges();
         return AITaskResult.SUCCESS;
     }

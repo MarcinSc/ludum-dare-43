@@ -1,0 +1,12 @@
+{
+  "Position2D": {},
+  "Obstacle": {},
+  "Ground": {},
+  "SensorTrigger": {},
+  "Platform": {},
+  "DustLayer": {
+    "dustGrowthPerSecond": 0.3,
+    "dustColor": "0,255,0",
+    "spawnedEntity": "shootingDustBunny"
+  }
+}
