@@ -38,8 +38,8 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
         dustLayerEntities = entityIndexManager.addIndexOnComponents(DustLayerComponent.class);
 
         shaderProgram = new ShaderProgram(
-                Gdx.files.internal("shaders/dustShader.vert"),
-                Gdx.files.internal("shaders/dustShader.frag"));
+                Gdx.files.internal("shaders/dustLayerShader.vert"),
+                Gdx.files.internal("shaders/dustLayerShader.frag"));
         if (shaderProgram.isCompiled() == false)
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 

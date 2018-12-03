@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
-import com.gempukku.ld43.model.DustBunnyComponent;
+import com.gempukku.ld43.model.DustComponent;
 import com.gempukku.ld43.model.GameScreenComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
@@ -21,13 +21,13 @@ import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 import com.gempukku.secsy.gaming.time.TimeManager;
 
 @RegisterSystem
-public class DustBunnyRenderer extends AbstractLifeCycleSystem {
+public class DustRenderer extends AbstractLifeCycleSystem {
     @Inject
     private EntityIndexManager entityIndexManager;
     @Inject
     private TimeManager timeManager;
 
-    private EntityIndex dustBunnyEntities;
+    private EntityIndex dustEntities;
 
     private ShaderProgram shaderProgram;
     private IndexBufferObject indexBufferObject;
@@ -35,11 +35,11 @@ public class DustBunnyRenderer extends AbstractLifeCycleSystem {
 
     @Override
     public void initialize() {
-        dustBunnyEntities = entityIndexManager.addIndexOnComponents(DustBunnyComponent.class);
+        dustEntities = entityIndexManager.addIndexOnComponents(DustComponent.class);
 
         shaderProgram = new ShaderProgram(
-                Gdx.files.internal("shaders/dustBunnyShader.vert"),
-                Gdx.files.internal("shaders/dustBunnyShader.frag"));
+                Gdx.files.internal("shaders/dustShader.vert"),
+                Gdx.files.internal("shaders/dustShader.frag"));
         if (shaderProgram.isCompiled() == false)
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
@@ -57,7 +57,7 @@ public class DustBunnyRenderer extends AbstractLifeCycleSystem {
     }
 
     @ReceiveEvent(priority = -3)
-    public void renderDustBunnies(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
+    public void renderDust(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
         float seconds = timeManager.getTime() / 1000f;
 
         Camera camera = renderToPipeline.getCamera();
@@ -73,15 +73,15 @@ public class DustBunnyRenderer extends AbstractLifeCycleSystem {
 
         shaderProgram.setUniformMatrix("u_projTrans", camera.combined);
 
-        for (EntityRef dustBunnyEntity : dustBunnyEntities) {
-            Position2DComponent position = dustBunnyEntity.getComponent(Position2DComponent.class);
-            DustBunnyComponent dustBunny = dustBunnyEntity.getComponent(DustBunnyComponent.class);
-            float x = position.getX() + dustBunny.getLeft();
-            float y = position.getY() + dustBunny.getDown();
-            float width = dustBunny.getRight() - dustBunny.getLeft();
-            float height = dustBunny.getUp() - dustBunny.getDown();
+        for (EntityRef dustEntity : dustEntities) {
+            Position2DComponent position = dustEntity.getComponent(Position2DComponent.class);
+            DustComponent dust = dustEntity.getComponent(DustComponent.class);
+            float x = position.getX() + dust.getLeft();
+            float y = position.getY() + dust.getDown();
+            float width = dust.getRight() - dust.getLeft();
+            float height = dust.getUp() - dust.getDown();
 
-            shaderProgram.setUniformf("u_bunnyColor", dustBunny.getColor());
+            shaderProgram.setUniformf("u_color", dust.getColor());
             shaderProgram.setUniformf("u_time", seconds);
             shaderProgram.setUniformf("u_coordinates", x, y, width, height);
 

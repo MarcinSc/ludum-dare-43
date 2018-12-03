@@ -5,14 +5,11 @@ precision mediump float;
 #define LOWP
 #endif
 
-uniform LOWP vec4 u_dustColor;
+uniform LOWP vec4 u_color;
 uniform float u_time;
-uniform float u_dustDepthPrevious;
-uniform float u_dustDepthCurrent;
-uniform float u_dustDepthNext;
 
 varying vec2 v_texCoords;
-varying float v_horizontalPositionInQuad;
+varying vec2 v_screenPosition;
 
 vec3 random3(vec3 c) {
     float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
@@ -62,22 +59,12 @@ float noise(vec3 p) {
 }
 
 void main() {
-    float dustHeight=0.0;
-    if (v_horizontalPositionInQuad<0.5) {
-        dustHeight = mix(u_dustDepthPrevious, u_dustDepthCurrent, v_horizontalPositionInQuad*2.0);
-    } else {
-        dustHeight = mix(u_dustDepthCurrent, u_dustDepthNext, v_horizontalPositionInQuad*2.0-1.0);
-    }
+    float noise = (noise(vec3(v_texCoords*3.0 + v_screenPosition*5.0, u_time/4.0))+1.0)/2.0;
+    float distanceFromCenter = clamp(distance(v_texCoords, vec2(0.5, 0.5))*2.0, 0.0, 1.0);
 
-    float noise = (noise(vec3(v_texCoords*2.0, u_time/4.0))+1.0)/2.0;
-    float alpha=mix(0.3, 1.0, noise);
-    if (v_texCoords.y>=dustHeight) {
-        alpha = 0.0;
-    } else {
-        alpha *= (1.0-v_texCoords.y/dustHeight)*(1.0-v_texCoords.y/dustHeight);
-        //alpha *= (1-v_texCoords.y/dustHeight) * (1-v_texCoords.y*dustHeight);
+    float minAlpha = 0.3;
+    float alpha = clamp(-1.0/(1.0-minAlpha)*distanceFromCenter+1.0/(1.0-minAlpha), 0.0, 1.0);
+    alpha *= clamp(1.5*noise, 0.0, 1.0);
 
-    }
-
-    gl_FragColor = vec4(u_dustColor.rgb, alpha);
+    gl_FragColor = vec4(u_color.rgb, alpha);
 }

@@ -1,6 +1,7 @@
 {
   "Position2D": {},
-  "DustBunny": {
+  "DustBunny": {},
+  "Dust": {
     "left": -0.05,
     "right": 0.05,
     "up": 0.1,
