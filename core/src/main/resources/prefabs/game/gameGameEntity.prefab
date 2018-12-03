@@ -5,7 +5,7 @@
     "startTime": 0,
     "backgroundMusicDefinitions": [
       {
-        "path": "sounds/background.wav",
+        "path": "sounds/background.ogg",
         "looping": true,
         "duration": -1,
         "fadeInDuration": 1000

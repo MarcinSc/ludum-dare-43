@@ -4,7 +4,7 @@
     "startTime": 2000,
     "backgroundMusicDefinitions": [
       {
-        "path": "sounds/noise.wav",
+        "path": "sounds/noise.ogg",
         "looping": false,
         "duration": 2000,
         "fadeInDuration": 100
