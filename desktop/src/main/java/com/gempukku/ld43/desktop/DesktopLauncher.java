@@ -4,6 +4,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.gempukku.secsy.gaming.SecsyGameApplication;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,9 +44,28 @@ public class DesktopLauncher {
         config.fullscreen = true;
         config.resizable = false;
 
+        DisplayMode largestDisplayMode = getLargestDisplayMode();
+        config.width = largestDisplayMode.getWidth();
+        config.height = largestDisplayMode.getHeight();
+
         config.foregroundFPS = 0;
         config.vSyncEnabled = true;
         config.title = "Ludum Dare 43";
         new LwjglApplication(new SecsyGameApplication(0, 0, activeProfiles), config);
+    }
+
+    private static DisplayMode getLargestDisplayMode() {
+        int width = 0;
+        DisplayMode result = null;
+        GraphicsEnvironment ge = GraphicsEnvironment.
+                getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        for (DisplayMode displayMode : gs[0].getDisplayModes()) {
+            if (displayMode.getWidth() > width) {
+                width = displayMode.getWidth();
+                result = displayMode;
+            }
+        }
+        return result;
     }
 }
