@@ -3,6 +3,7 @@ package com.gempukku.ld43.logic.damage;
 import com.gempukku.ld43.logic.level.EntityOutOfBounds;
 import com.gempukku.ld43.logic.level.PlayerDied;
 import com.gempukku.ld43.logic.spawn.SpawnEntity;
+import com.gempukku.ld43.model.DestroyOnCollisionComponent;
 import com.gempukku.ld43.model.DustBunnyComponent;
 import com.gempukku.ld43.model.PlayerComponent;
 import com.gempukku.ld43.render.RenderText;
@@ -16,6 +17,7 @@ import com.gempukku.secsy.entity.game.GameLoopUpdate;
 import com.gempukku.secsy.entity.index.EntityIndex;
 import com.gempukku.secsy.entity.index.EntityIndexManager;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
+import com.gempukku.secsy.gaming.physics.basic2d.EntityCollided;
 import com.gempukku.secsy.gaming.time.TimeEntityProvider;
 
 import java.util.Iterator;
@@ -70,8 +72,13 @@ public class DeathSystem extends AbstractLifeCycleSystem {
 
     @ReceiveEvent
     public void dustBunnyDamaged(EntityDamaged entityDamaged, EntityRef entity, DustBunnyComponent dustBunny, Position2DComponent position) {
-        entity.send(new SpawnEntity("dustBunnyDeath", position.getX(), position.getY()));
+        entity.send(new SpawnEntity("explosion", position.getX(), position.getY()));
+        entityManager.destroyEntity(entity);
+    }
 
+    @ReceiveEvent
+    public void destroyOnCollision(EntityCollided entityCollided, EntityRef entity, DestroyOnCollisionComponent destroyOnCollisionComponent, Position2DComponent position) {
+        entity.send(new SpawnEntity("explosion", position.getX(), position.getY()));
         entityManager.destroyEntity(entity);
     }
 

@@ -1,5 +1,4 @@
 TODO:
-- Introduce other enemy types.
 
 Done:
 - Proper loading of levels.
@@ -13,3 +12,4 @@ Done:
 - Tutorial about dust and sweeping.
 - Introduce broom.
 - Improve rendering of dust based on alpha texture.
+- Introduce other enemy types.
