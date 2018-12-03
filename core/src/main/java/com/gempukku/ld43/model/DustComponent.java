@@ -5,4 +5,6 @@ import com.gempukku.secsy.gaming.component.Bounds2DComponent;
 
 public interface DustComponent extends Bounds2DComponent {
     Color getColor();
+
+    String getShape();
 }

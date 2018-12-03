@@ -5,7 +5,8 @@
     "left": -0.05,
     "right": 0.05,
     "up": 0.1,
-    "color": "255,0,0"
+    "color": "255,0,0",
+    "shape": "images/bunnyShape.png"
   },
   "AffectedByGravity": {},
   "CollidingBody": {

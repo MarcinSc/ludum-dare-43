@@ -5,11 +5,15 @@ precision mediump float;
 #define LOWP
 #endif
 
+uniform sampler2D u_shapeTexture;
+
 uniform LOWP vec4 u_color;
 uniform float u_time;
+uniform sampler2D u_texture;
 
 varying vec2 v_texCoords;
 varying vec2 v_screenPosition;
+varying vec2 v_realTexCoords;
 
 vec3 random3(vec3 c) {
     float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
@@ -60,11 +64,15 @@ float noise(vec3 p) {
 
 void main() {
     float noise = (noise(vec3(v_texCoords*3.0 + v_screenPosition*5.0, u_time/4.0))+1.0)/2.0;
-    float distanceFromCenter = clamp(distance(v_texCoords, vec2(0.5, 0.5))*2.0, 0.0, 1.0);
 
-    float minAlpha = 0.3;
-    float alpha = clamp(-1.0/(1.0-minAlpha)*distanceFromCenter+1.0/(1.0-minAlpha), 0.0, 1.0);
-    alpha *= clamp(1.5*noise, 0.0, 1.0);
+    float alpha = noise;
+
+    vec4 shapeColor = texture2D(u_shapeTexture, v_realTexCoords);
+    float green = shapeColor.g;
+    float red = shapeColor.r;
+
+    alpha*=red;
+    alpha = max(alpha, green);
 
     gl_FragColor = vec4(u_color.rgb, alpha);
 }
