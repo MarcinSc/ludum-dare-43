@@ -7,9 +7,13 @@
     "splashDefinitions": [
       {
         "textureName": "images/JGD-logo-large.png",
-        "duration": 2000,
+        "duration": 3000,
         "backgroundColor": "255,255,255"
       }
     ]
+  },
+  "Grain": {
+    "grainSize": 5,
+    "factor": 0
   }
 }

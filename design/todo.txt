@@ -1,6 +1,5 @@
 TODO:
 - Introduce other enemy types.
-- Improve rendering of dust bunnies based on alpha texture.
 
 Done:
 - Proper loading of levels.
@@ -13,3 +12,4 @@ Done:
 - Displaying tutorial text.
 - Tutorial about dust and sweeping.
 - Introduce broom.
+- Improve rendering of dust based on alpha texture.

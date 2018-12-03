@@ -10,8 +10,6 @@ import com.gempukku.secsy.entity.game.GameLoopUpdate;
 import com.gempukku.secsy.gaming.easing.EasingResolver;
 import com.gempukku.secsy.gaming.rendering.pipeline.CameraEntityProvider;
 import com.gempukku.secsy.gaming.rendering.postprocess.tint.grain.GrainComponent;
-import com.gempukku.secsy.gaming.rendering.splash.SplashSeriesComponent;
-import com.gempukku.secsy.gaming.rendering.splash.SplashSeriesEnded;
 import com.gempukku.secsy.gaming.time.TimeManager;
 
 @RegisterSystem
@@ -24,17 +22,6 @@ public class SplashScreenSystem {
     private TimeManager timeManager;
     @Inject
     private EasingResolver easingResolver;
-
-    @ReceiveEvent
-    public void splashSeriesEnded(SplashSeriesEnded splashSeriesEnded, EntityRef cameraEntity) {
-        cameraEntity.removeComponents(SplashSeriesComponent.class);
-
-        GrainComponent grain = cameraEntity.createComponent(GrainComponent.class);
-        grain.setFactor(0f);
-        grain.setGrainSize(5);
-
-        cameraEntity.saveChanges();
-    }
 
     @ReceiveEvent
     public void updateGrain(GameLoopUpdate gameLoopUpdate) {
