@@ -47,7 +47,7 @@ public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem impleme
             TextureAtlas textureAtlas = textureAtlases.get(textureAtlasId);
             PixmapPacker packer = packers.get(textureAtlasId);
             packer.pack(name, new Pixmap(Gdx.files.internal(name)));
-            packer.updateTextureAtlas(textureAtlas, Texture.TextureFilter.Linear, Texture.TextureFilter.Linear, false);
+            packer.updateTextureAtlas(textureAtlas, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false);
             textureRegion = textureAtlas.findRegion(name);
             textureRegionMap.put(name, textureRegion);
         }

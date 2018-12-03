@@ -16,6 +16,8 @@ import java.util.Map;
 public class MapNamingConventionProxyComponentManager implements ComponentManager, InternalComponentManager {
     @Inject
     private EntityComponentFieldHandler entityComponentFieldHandler;
+    @Inject
+    private ComponentFieldConverter componentFieldConverter;
 
     private static final Object NULL_VALUE = new Object();
     private Map<Class<? extends Component>, ComponentDef> componentDefinitions = new HashMap<Class<? extends Component>, ComponentDef>();
@@ -306,6 +308,8 @@ public class MapNamingConventionProxyComponentManager implements ComponentManage
                     return (byte) 0;
                 }
                 throw new IllegalStateException("Unable to find default value for this type");
+            } else if (componentFieldConverter.hasConverterForType(resultClass)) {
+                return componentFieldConverter.getDefaultValue(resultClass);
             }
             return null;
         }

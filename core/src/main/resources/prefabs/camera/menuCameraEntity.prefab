@@ -1,3 +1,5 @@
 {
-  "Camera2D": {}
+  "GlobalEntity": {},
+  "Camera2D": {},
+  "MenuScreen": {}
 }

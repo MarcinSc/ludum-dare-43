@@ -1,16 +1,24 @@
 {
+  "GlobalEntity": {},
   "Camera2D": {},
   "GameScreen": {},
   "TrackingCamera": {
     "followingNotGrounded": true,
     "orientationBasedDistance": 0.1
   },
-  "ZoomCamera": {
-    "xScale": 0.002,
-    "yScale": 0.002
-  },
   "LerpCamera": {
     "xProgress": 2,
     "yProgress": 2
+  },
+  "ClampCamera": {
+    "minX": -100,
+    "maxX": 10,
+    "minY": -0.5,
+    "maxY": 100
+  },
+  "ScreenShakeCamera": {},
+  "ColorTint": {
+    "color": "0,0,0",
+    "factor": 1
   }
 }

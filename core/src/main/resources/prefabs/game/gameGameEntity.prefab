@@ -1,0 +1,18 @@
+{
+  "GlobalEntity": {},
+  "GameScreen": {},
+  "BackgroundMusic": {
+    "startTime": 0,
+    "backgroundMusicDefinitions": [
+      {
+        "path": "sounds/background.wav",
+        "looping": true,
+        "duration": -1,
+        "fadeInDuration": 1000
+      }
+    ]
+  },
+  "Level": {
+    "levelIndex": 0
+  }
+}

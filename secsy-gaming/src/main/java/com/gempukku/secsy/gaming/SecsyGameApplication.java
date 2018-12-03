@@ -2,6 +2,7 @@ package com.gempukku.secsy.gaming;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.gempukku.secsy.context.SECSyContext;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.ReflectionsAnnotatedTypesSystemProducer;
@@ -47,6 +48,11 @@ public class SecsyGameApplication extends ApplicationAdapter {
         context.startup();
 
         lastUpdateTime = System.currentTimeMillis();
+
+        InputProcessor inputProcessor = context.getSystem(InputProcessor.class);
+        if (inputProcessor != null) {
+            Gdx.input.setInputProcessor(inputProcessor);
+        }
     }
 
     private boolean hasAllProfiles(String[] requiredProfiles, Set<String> activeProfiles) {

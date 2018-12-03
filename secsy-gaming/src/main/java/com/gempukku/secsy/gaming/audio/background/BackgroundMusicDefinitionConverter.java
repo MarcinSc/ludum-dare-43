@@ -7,7 +7,8 @@ public class BackgroundMusicDefinitionConverter implements ComponentFieldTypeCon
     @Override
     public BackgroundMusicDefinition convertTo(JSONObject value) {
         return new BackgroundMusicDefinition(
-                (String) value.get("path"), (Boolean) value.get("looping"), ((Number) value.get("duration")).longValue());
+                (String) value.get("path"), (Boolean) value.get("looping"), ((Number) value.get("duration")).longValue(),
+                ((Number) value.get("fadeInDuration")).longValue());
     }
 
     @Override

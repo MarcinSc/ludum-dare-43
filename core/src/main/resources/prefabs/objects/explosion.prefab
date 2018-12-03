@@ -1,0 +1,8 @@
+{
+  "Position2D": {},
+  "ParticleEffect": {
+    "path": "particles/explosion.p",
+    "destroyOnEffectEnd": true,
+    "color": "255,0,0"
+  }
+}

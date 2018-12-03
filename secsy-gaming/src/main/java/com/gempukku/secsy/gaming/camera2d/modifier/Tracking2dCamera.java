@@ -29,25 +29,39 @@ public class Tracking2dCamera extends AbstractLifeCycleSystem {
 
     @ReceiveEvent(priorityName = "gaming.camera2d.tracking")
     public void trackObject(Adjust2dCamera cameraLocation, EntityRef cameraEntity, TrackingCameraComponent trackingCamera) {
-        EntityRef firstTracked = cameraTrackedEntities.getEntities().iterator().next();
-        Position2DComponent position = firstTracked.getComponent(Position2DComponent.class);
-        CameraTrackedComponent cameraTracked = firstTracked.getComponent(CameraTrackedComponent.class);
-        float newX = position.getX() + cameraTracked.getX();
-        newX += getOrientationBasedDifference(cameraLocation, trackingCamera, firstTracked);
-        cameraLocation.setX(newX);
-        float y = position.getY() + cameraTracked.getY();
-        if (trackingCamera.isFollowingNotGrounded()) {
-            cameraLocation.setY(y);
-        } else {
-            GroundedComponent grounded = firstTracked.getComponent(GroundedComponent.class);
-            if (grounded.isGrounded()) {
+        EntityRef firstTracked = getTrackedEntity();
+        if (firstTracked != null) {
+            Position2DComponent position = firstTracked.getComponent(Position2DComponent.class);
+            CameraTrackedComponent cameraTracked = firstTracked.getComponent(CameraTrackedComponent.class);
+            float newX = position.getX() + cameraTracked.getX();
+            newX += getOrientationBasedDifference(cameraLocation, trackingCamera, firstTracked);
+            cameraLocation.setX(newX);
+            float y = position.getY() + cameraTracked.getY();
+            if (trackingCamera.isFollowingNotGrounded()) {
                 cameraLocation.setY(y);
-                trackingCamera.setLastGroundY(y);
-                cameraEntity.saveChanges();
             } else {
-                cameraLocation.setY(trackingCamera.getLastGroundY());
+                GroundedComponent grounded = firstTracked.getComponent(GroundedComponent.class);
+                if (grounded.isGrounded()) {
+                    cameraLocation.setY(y);
+                    trackingCamera.setLastGroundY(y);
+                    cameraEntity.saveChanges();
+                } else {
+                    cameraLocation.setY(trackingCamera.getLastGroundY());
+                }
             }
+        } else {
+            cameraLocation.setX(cameraLocation.getLastX());
+            cameraLocation.setY(cameraLocation.getLastY());
         }
+
+    }
+
+    private EntityRef getTrackedEntity() {
+        for (EntityRef cameraTrackedEntity : cameraTrackedEntities) {
+            return cameraTrackedEntity;
+        }
+
+        return null;
     }
 
     private float getOrientationBasedDifference(Adjust2dCamera cameraLocation, TrackingCameraComponent trackingCamera, EntityRef firstTracked) {

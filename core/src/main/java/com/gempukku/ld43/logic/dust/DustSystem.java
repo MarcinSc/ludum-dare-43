@@ -1,9 +1,9 @@
 package com.gempukku.ld43.logic.dust;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.gempukku.ld43.logic.level.LevelSystem;
 import com.gempukku.ld43.logic.spawn.SpawnEntity;
 import com.gempukku.ld43.model.DustLayerComponent;
-import com.gempukku.ld43.model.LevelBuilder;
 import com.gempukku.ld43.model.SweeperComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
@@ -108,7 +108,7 @@ public class DustSystem extends AbstractLifeCycleSystem {
     private int findClosestPileIndex(float sweeperPosition, float sweepedPosition, float sweepedWidth) {
         float sweepedPerc = (sweeperPosition - sweepedPosition) / sweepedWidth;
         sweepedPerc = MathUtils.clamp(sweepedPerc, 0f, 1f);
-        int pileCount = MathUtils.floor(sweepedWidth * LevelBuilder.PILE_COUNT_PER_METER) - 1;
+        int pileCount = MathUtils.floor(sweepedWidth * LevelSystem.PILE_COUNT_PER_METER) - 1;
         return MathUtils.round(sweepedPerc * pileCount);
 
     }
