@@ -22,6 +22,7 @@
     "speedX": 1
   },
   "DestroyOnCollision": {
-    "destroyedPrefab": "explosion"
+    "particleEffect": "particles/explosion.p",
+    "particleColor": "255,0,0"
   }
 }
