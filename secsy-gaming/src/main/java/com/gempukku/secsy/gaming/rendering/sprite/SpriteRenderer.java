@@ -35,7 +35,7 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
         spriteEntities = entityIndexManager.addIndexOnComponents(SpriteComponent.class);
     }
 
-    @ReceiveEvent
+    @ReceiveEvent(priorityName = "gaming.renderer.sprites")
     public void renderSprites(RenderToPipeline renderToPipeline, EntityRef cameraEntity) {
         sprites.clear();
         for (EntityRef spriteEntity : spriteEntities) {
