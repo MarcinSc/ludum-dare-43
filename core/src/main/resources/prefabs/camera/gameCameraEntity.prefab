@@ -17,6 +17,11 @@
     "maxY": 100
   },
   "ScreenShakeCamera": {},
+  "PixelPerfectCamera": {
+    "exampleObjectHeightInPixels": 32,
+    "exampleObjectHeightInUnits": 0.2,
+    "partOfScreenItShouldTake": 0.1
+  },
   "ColorTint": {
     "color": "0,0,0",
     "factor": 1
