@@ -40,7 +40,7 @@ public class DustLayerRenderer extends AbstractLifeCycleSystem {
         shaderProgram = new ShaderProgram(
                 Gdx.files.internal("shaders/dustLayerShader.vert"),
                 Gdx.files.internal("shaders/dustLayerShader.frag"));
-        if (shaderProgram.isCompiled() == false)
+        if (!shaderProgram.isCompiled())
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
         float[] verticeData = new float[]{
