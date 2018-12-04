@@ -41,6 +41,7 @@ public class DesktopLauncher {
         activeProfiles.add("colorTint");
         activeProfiles.add("particle2d");
         activeProfiles.add("sprites");
+        activeProfiles.add("aiMovement");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.fullscreen = true;

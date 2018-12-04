@@ -13,7 +13,7 @@ import com.gempukku.secsy.gaming.component.GroundedComponent;
 import com.gempukku.secsy.gaming.component.HorizontalOrientationComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.MovingComponent;
 
-@RegisterSystem
+@RegisterSystem(profiles = {"ai", "aiMovement"})
 public class AIMovementSystem extends AbstractLifeCycleSystem {
     @Inject
     private AIEngine aiEngine;
