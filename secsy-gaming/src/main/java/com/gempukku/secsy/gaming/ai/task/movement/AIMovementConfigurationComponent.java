@@ -1,4 +1,4 @@
-package com.gempukku.ld43.logic.ai;
+package com.gempukku.secsy.gaming.ai.task.movement;
 
 import com.gempukku.secsy.entity.Component;
 

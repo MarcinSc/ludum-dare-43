@@ -1,6 +1,5 @@
-package com.gempukku.ld43.logic.ai;
+package com.gempukku.secsy.gaming.ai.task.movement;
 
-import com.gempukku.ld43.model.PlatformComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -13,7 +12,6 @@ import com.gempukku.secsy.gaming.ai.AIEngine;
 import com.gempukku.secsy.gaming.component.GroundedComponent;
 import com.gempukku.secsy.gaming.component.HorizontalOrientationComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.MovingComponent;
-import com.gempukku.secsy.gaming.physics.basic2d.SensorContactEnd;
 
 @RegisterSystem
 public class AIMovementSystem extends AbstractLifeCycleSystem {
@@ -29,16 +27,8 @@ public class AIMovementSystem extends AbstractLifeCycleSystem {
     }
 
     @ReceiveEvent
-    public void cantMove(SensorContactEnd sensorContactEnd, EntityRef entity, AIApplyMovementIfPossibleComponent aiApplyMovement,
-                         HorizontalOrientationComponent horizontalOrientation) {
-        boolean right = horizontalOrientation.isFacingRight();
-        if (right && sensorContactEnd.getSensorType().equals("rightGroundSensor")
-                && sensorContactEnd.getSensorTrigger().hasComponent(PlatformComponent.class)) {
-            notifyCantMove(entity);
-        } else if (!right && sensorContactEnd.getSensorType().equals("leftGroundSensor")
-                && sensorContactEnd.getSensorTrigger().hasComponent(PlatformComponent.class)) {
-            notifyCantMove(entity);
-        }
+    public void aiCantMove(AICantMove aiCantMove, EntityRef entity, AIApplyMovementIfPossibleComponent applyMovement) {
+        notifyCantMove(entity);
     }
 
     private void notifyCantMove(EntityRef entity) {

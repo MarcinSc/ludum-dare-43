@@ -51,6 +51,9 @@
   "AIMovementConfiguration": {
     "movementVelocity": 0.8
   },
+  "AIJumpConfiguration": {
+    "jumpSpeed": 2
+  },
   "Grounded": {},
   "Moving": {},
   "HorizontalOrientation": {}
