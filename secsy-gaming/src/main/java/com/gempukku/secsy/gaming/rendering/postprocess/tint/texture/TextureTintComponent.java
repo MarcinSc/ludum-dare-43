@@ -8,6 +8,5 @@ public interface TextureTintComponent extends Component {
     String getTextureName();
 
     float getFactor();
-
     void setFactor(float factor);
 }
