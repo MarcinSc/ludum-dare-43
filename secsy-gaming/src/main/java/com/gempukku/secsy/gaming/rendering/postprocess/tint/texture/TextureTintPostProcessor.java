@@ -35,7 +35,7 @@ public class TextureTintPostProcessor extends AbstractLifeCycleSystem {
     public void initialize() {
         shaderProgram = new ShaderProgram(
                 Gdx.files.internal("shader/viewToScreenCoords.vert"),
-                Gdx.files.internal("shader/grainTint.frag"));
+                Gdx.files.internal("shader/textureTint.frag"));
         if (!shaderProgram.isCompiled())
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 

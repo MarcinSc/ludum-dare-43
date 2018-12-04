@@ -2,14 +2,11 @@ package com.gempukku.secsy.gaming.rendering.postprocess.gamma;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
@@ -17,69 +14,85 @@ import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderPipeline;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 
+import java.util.Random;
+
 @RegisterSystem(
         profiles = "gamma")
 public class GammaPostProcessor extends AbstractLifeCycleSystem {
-    private ModelBatch modelBatch;
+    private ShaderProgram shaderProgram;
+    private VertexBufferObject vertexBufferObject;
+    private IndexBufferObject indexBufferObject;
 
-    private GammaShaderProvider gammaShaderProvider;
-    private ModelInstance modelInstance;
-    private Model model;
+    private Random rnd = new Random();
 
     @Override
-    public void preInitialize() {
-        gammaShaderProvider = new GammaShaderProvider();
+    public void initialize() {
+        shaderProgram = new ShaderProgram(
+                Gdx.files.internal("shader/viewToScreenCoords.vert"),
+                Gdx.files.internal("shader/gamma.frag"));
+        if (!shaderProgram.isCompiled())
+            throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
-        modelBatch = new ModelBatch(gammaShaderProvider);
-        ModelBuilder modelBuilder = new ModelBuilder();
-        modelBuilder.begin();
-        MeshPartBuilder backgroundBuilder = modelBuilder.part("screen", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position, new Material());
-        backgroundBuilder.rect(
-                0, 1, 1,
-                0, 0, 1,
-                1, 0, 1,
-                1, 1, 1,
-                0, 0, 1);
-        model = modelBuilder.end();
+        float[] verticeData = new float[]{
+                0, 0, 0,
+                0, 1, 0,
+                1, 0, 0,
+                1, 1, 0};
+        short[] indices = {0, 1, 2, 2, 1, 3};
 
-        modelInstance = new ModelInstance(model);
+        vertexBufferObject = new VertexBufferObject(true, 4, VertexAttribute.Position());
+        indexBufferObject = new IndexBufferObject(true, indices.length);
+        vertexBufferObject.setVertices(verticeData, 0, verticeData.length);
+        indexBufferObject.setIndices(indices, 0, indices.length);
     }
 
     @ReceiveEvent(priorityName = "gaming.renderer.gamma")
-    public void render(RenderToPipeline event, EntityRef renderingEntity, GammaComponent gamma) {
+    public void render(RenderToPipeline renderToPipeline, EntityRef renderingEntity, GammaComponent gamma) {
         float factor = gamma.getFactor();
 
-        if (factor != 1) {
-            gammaShaderProvider.setSourceTextureIndex(0);
-            gammaShaderProvider.setFactor(factor);
-
-            RenderPipeline renderPipeline = event.getRenderPipeline();
+        if (factor > 0) {
+            RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
             FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
-            int textureHandle = currentBuffer.getColorBufferTexture().getTextureObjectHandle();
 
-            FrameBuffer frameBuffer = renderPipeline.getNewFrameBuffer(currentBuffer.getWidth(), currentBuffer.getHeight());
-            frameBuffer.begin();
+            int width = currentBuffer.getWidth();
+            int height = currentBuffer.getHeight();
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, textureHandle);
+            FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
 
-            Gdx.gl.glClearColor(0, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            newBuffer.begin();
 
-            modelBatch.begin(event.getCamera());
-            modelBatch.render(modelInstance);
-            modelBatch.end();
+            shaderProgram.begin();
 
-            frameBuffer.end();
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+
+            vertexBufferObject.bind(shaderProgram);
+            indexBufferObject.bind();
+
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + 0);
+            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
+
+            shaderProgram.setUniformf("u_sourceTexture", 0);
+            shaderProgram.setUniformf("u_factor", factor);
+            shaderProgram.setUniformf("u_random", rnd.nextFloat(), rnd.nextFloat());
+
+            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+            vertexBufferObject.unbind(shaderProgram);
+            indexBufferObject.unbind();
+
+            shaderProgram.end();
+
+            newBuffer.end();
+
             renderPipeline.returnFrameBuffer(currentBuffer);
-            renderPipeline.setCurrentBuffer(frameBuffer);
+            renderPipeline.setCurrentBuffer(newBuffer);
         }
     }
 
     @Override
     public void postDestroy() {
-        modelBatch.dispose();
-        model.dispose();
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
+        shaderProgram.dispose();
     }
 }
