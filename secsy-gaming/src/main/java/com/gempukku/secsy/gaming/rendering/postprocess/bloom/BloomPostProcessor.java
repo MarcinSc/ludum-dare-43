@@ -2,14 +2,11 @@ package com.gempukku.secsy.gaming.rendering.postprocess.bloom;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
@@ -20,67 +17,79 @@ import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 @RegisterSystem(
         profiles = "bloom")
 public class BloomPostProcessor extends AbstractLifeCycleSystem {
-    private ModelBatch modelBatch;
-
-    private BloomShaderProvider bloomShaderProvider;
-    private ModelInstance modelInstance;
-    private Model model;
+    private ShaderProgram shaderProgram;
+    private VertexBufferObject vertexBufferObject;
+    private IndexBufferObject indexBufferObject;
 
     @Override
-    public void preInitialize() {
-        bloomShaderProvider = new BloomShaderProvider();
+    public void initialize() {
+        shaderProgram = new ShaderProgram(
+                Gdx.files.internal("shader/viewToScreenCoords.vert"),
+                Gdx.files.internal("shader/bloom.frag"));
+        if (!shaderProgram.isCompiled())
+            throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
-        modelBatch = new ModelBatch(bloomShaderProvider);
-        ModelBuilder modelBuilder = new ModelBuilder();
-        modelBuilder.begin();
-        MeshPartBuilder backgroundBuilder = modelBuilder.part("screen", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position, new Material());
-        backgroundBuilder.rect(
-                0, 1, 1,
-                0, 0, 1,
-                1, 0, 1,
-                1, 1, 1,
-                0, 0, 1);
-        model = modelBuilder.end();
+        float[] verticeData = new float[]{
+                0, 0, 0,
+                0, 1, 0,
+                1, 0, 0,
+                1, 1, 0};
+        short[] indices = {0, 1, 2, 2, 1, 3};
 
-        modelInstance = new ModelInstance(model);
+        vertexBufferObject = new VertexBufferObject(true, 4, VertexAttribute.Position());
+        indexBufferObject = new IndexBufferObject(true, indices.length);
+        vertexBufferObject.setVertices(verticeData, 0, verticeData.length);
+        indexBufferObject.setIndices(indices, 0, indices.length);
     }
 
     @ReceiveEvent(priorityName = "gaming.renderer.bloom")
-    public void render(RenderToPipeline event, EntityRef renderingEntity, BloomComponent bloom) {
+    public void render(RenderToPipeline renderToPipeline, EntityRef renderingEntity, BloomComponent bloom) {
         float minimalBrightness = bloom.getMinimalBrightness();
         if (minimalBrightness < 1) {
-            RenderPipeline renderPipeline = event.getRenderPipeline();
+            RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
             FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
-            int textureHandle = currentBuffer.getColorBufferTexture().getTextureObjectHandle();
 
-            bloomShaderProvider.setSourceTextureIndex(0);
-            bloomShaderProvider.setBlurRadius(bloom.getBlurRadius());
-            bloomShaderProvider.setMinimalBrightness(minimalBrightness);
-            bloomShaderProvider.setBloomStrength(bloom.getBloomStrength());
+            int width = currentBuffer.getWidth();
+            int height = currentBuffer.getHeight();
 
-            FrameBuffer frameBuffer = renderPipeline.getNewFrameBuffer(currentBuffer.getWidth(), currentBuffer.getHeight());
-            frameBuffer.begin();
+            FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+
+            newBuffer.begin();
+
+            shaderProgram.begin();
+
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+
+            vertexBufferObject.bind(shaderProgram);
+            indexBufferObject.bind();
 
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + 0);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, textureHandle);
+            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
 
-            Gdx.gl.glClearColor(0, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            shaderProgram.setUniformf("u_sourceTexture", 0);
+            shaderProgram.setUniformf("u_minimalBrightness", minimalBrightness);
+            shaderProgram.setUniformf("u_pixelSize", 1f / width, 1f / height);
+            shaderProgram.setUniformf("u_blurRadius", bloom.getBlurRadius());
+            shaderProgram.setUniformf("u_bloomStrength", bloom.getBloomStrength());
 
-            modelBatch.begin(event.getCamera());
-            modelBatch.render(modelInstance);
-            modelBatch.end();
+            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+            vertexBufferObject.unbind(shaderProgram);
+            indexBufferObject.unbind();
 
-            frameBuffer.end();
+            shaderProgram.end();
+
+            newBuffer.end();
+
             renderPipeline.returnFrameBuffer(currentBuffer);
-            renderPipeline.setCurrentBuffer(frameBuffer);
+            renderPipeline.setCurrentBuffer(newBuffer);
         }
     }
 
     @Override
     public void postDestroy() {
-        modelBatch.dispose();
-        model.dispose();
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
+        shaderProgram.dispose();
     }
 }
