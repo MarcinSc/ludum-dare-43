@@ -1,4 +1,4 @@
-package com.gempukku.ld43.render;
+package com.gempukku.secsy.gaming.rendering.sprite;
 
 import com.gempukku.secsy.gaming.component.Bounds2DComponent;
 

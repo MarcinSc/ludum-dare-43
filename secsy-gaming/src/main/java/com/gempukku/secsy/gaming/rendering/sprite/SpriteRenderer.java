@@ -1,9 +1,8 @@
-package com.gempukku.ld43.render;
+package com.gempukku.secsy.gaming.rendering.sprite;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gempukku.ld43.model.GameScreenComponent;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -17,7 +16,7 @@ import com.gempukku.secsy.gaming.component.HorizontalOrientationComponent;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 
-@RegisterSystem
+@RegisterSystem(profiles = "sprites")
 public class SpriteRenderer extends AbstractLifeCycleSystem {
     @Inject
     private EntityIndexManager entityIndexManager;
@@ -33,12 +32,11 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
     public void initialize() {
         spriteBatch = new SpriteBatch();
 
-
         spriteEntities = entityIndexManager.addIndexOnComponents(SpriteComponent.class);
     }
 
     @ReceiveEvent
-    public void renderSprites(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
+    public void renderSprites(RenderToPipeline renderToPipeline, EntityRef cameraEntity) {
         sprites.clear();
         for (EntityRef spriteEntity : spriteEntities) {
             SpriteComponent sprite = spriteEntity.getComponent(SpriteComponent.class);
@@ -46,16 +44,18 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
             sprites.put(spriteEntity, priority);
         }
 
-        renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
+        if (!sprites.isEmpty()) {
+            renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
 
-        Camera camera = renderToPipeline.getCamera();
+            Camera camera = renderToPipeline.getCamera();
 
-        spriteBatch.setProjectionMatrix(camera.combined);
-        spriteBatch.begin();
-        renderSprites();
-        spriteBatch.end();
+            spriteBatch.setProjectionMatrix(camera.combined);
+            spriteBatch.begin();
+            renderSprites();
+            spriteBatch.end();
 
-        renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
+            renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
+        }
     }
 
     private void renderSprites() {

@@ -40,6 +40,7 @@ public class DesktopLauncher {
         activeProfiles.add("delayActions");
         activeProfiles.add("colorTint");
         activeProfiles.add("particle2d");
+        activeProfiles.add("sprites");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.fullscreen = true;

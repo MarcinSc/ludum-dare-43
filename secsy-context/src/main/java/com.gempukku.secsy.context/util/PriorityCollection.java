@@ -47,6 +47,10 @@ public class PriorityCollection<T> implements Iterable<T> {
         return priority;
     }
 
+    public boolean isEmpty() {
+        return multimap.isEmpty();
+    }
+
     @Override
     public Iterator<T> iterator() {
         return multimap.values().iterator();
