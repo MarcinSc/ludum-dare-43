@@ -1,4 +1,4 @@
-package com.gempukku.secsy.gaming.ai.task.movement;
+package com.gempukku.secsy.gaming.ai.movement;
 
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.gaming.ai.AITask;

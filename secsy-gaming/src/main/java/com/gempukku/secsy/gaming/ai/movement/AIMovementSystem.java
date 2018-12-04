@@ -1,4 +1,4 @@
-package com.gempukku.secsy.gaming.ai.task.movement;
+package com.gempukku.secsy.gaming.ai.movement;
 
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
