@@ -15,14 +15,11 @@ public class PixelPerfectCamera {
     public void adjustCamera(Adjust2dCamera cameraLocation, EntityRef camera, PixelPerfectCameraComponent pixelPerfectCamera) {
         float screenHeight = cameraLocation.getViewportHeight();
 
-        float objectSpriteHeight = pixelPerfectCamera.getExampleObjectHeightInPixels();
-        float intendedObjectPropotion = pixelPerfectCamera.getPartOfScreenItShouldTake();
+        float intendedPixelSize = screenHeight * pixelPerfectCamera.getPartOfScreenItShouldTake()
+                / pixelPerfectCamera.getExampleObjectHeightInPixels();
+        int roundedPixelSize = Math.max(1, MathUtils.round(intendedPixelSize));
 
-        float pixelSize = screenHeight * intendedObjectPropotion / objectSpriteHeight;
-        int pixelScale = Math.max(1, MathUtils.round(pixelSize));
-
-        float objectHeightInUnits = pixelPerfectCamera.getExampleObjectHeightInUnits();
-        float objectHeightInPixels = pixelScale * objectSpriteHeight / objectHeightInUnits;
+        float objectHeightInPixels = roundedPixelSize * pixelPerfectCamera.getExampleObjectHeightInPixels() / pixelPerfectCamera.getExampleObjectHeightInUnits();
 
         float visibleHeight = screenHeight / objectHeightInPixels;
         float visibleWidth = visibleHeight * cameraLocation.getViewportWidth() / screenHeight;
