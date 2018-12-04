@@ -1,11 +1,15 @@
 package com.gempukku.secsy.gaming.rendering.sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Pool;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
+import com.gempukku.secsy.context.util.Prioritable;
 import com.gempukku.secsy.context.util.PriorityCollection;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
@@ -15,6 +19,9 @@ import com.gempukku.secsy.gaming.asset.texture.TextureAtlasProvider;
 import com.gempukku.secsy.gaming.component.HorizontalOrientationComponent;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RegisterSystem(profiles = "sprites")
 public class SpriteRenderer extends AbstractLifeCycleSystem {
@@ -26,7 +33,13 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
     private SpriteBatch spriteBatch;
 
     private EntityIndex spriteEntities;
-    private PriorityCollection<EntityRef> sprites = new PriorityCollection<EntityRef>();
+    private PriorityCollection<RenderableSprite> sprites = new PriorityCollection<RenderableSprite>();
+    private SpriteSinkImpl spriteSink = new SpriteSinkImpl();
+
+    private Map<String, Texture> tiledTextures = new HashMap<String, Texture>();
+
+    private NormalRenderableSpritePool normalPool = new NormalRenderableSpritePool();
+    private TiledRenderableSpritePool tiledPool = new TiledRenderableSpritePool();
 
     @Override
     public void initialize() {
@@ -37,12 +50,7 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
 
     @ReceiveEvent(priorityName = "gaming.renderer.sprites")
     public void renderSprites(RenderToPipeline renderToPipeline, EntityRef cameraEntity) {
-        sprites.clear();
-        for (EntityRef spriteEntity : spriteEntities) {
-            SpriteComponent sprite = spriteEntity.getComponent(SpriteComponent.class);
-            float priority = sprite.getPriority();
-            sprites.put(spriteEntity, priority);
-        }
+        cameraEntity.send(new GatherSprites(spriteSink));
 
         if (!sprites.isEmpty()) {
             renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
@@ -55,27 +63,161 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
             spriteBatch.end();
 
             renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
+
+            sprites.clear();
         }
     }
 
-    private void renderSprites() {
-        for (EntityRef spriteEntity : sprites) {
+    @ReceiveEvent
+    public void gatherSprites(GatherSprites gatherSprites) {
+        SpriteSink spriteSink = gatherSprites.getSpriteSink();
+        for (EntityRef spriteEntity : spriteEntities) {
             Position2DComponent position = spriteEntity.getComponent(Position2DComponent.class);
             SpriteComponent sprite = spriteEntity.getComponent(SpriteComponent.class);
             HorizontalOrientationComponent horizontal = spriteEntity.getComponent(HorizontalOrientationComponent.class);
 
-            TextureRegion spriteTexture = textureAtlasProvider.getTexture("sprites", sprite.getFileName());
             if (horizontal != null && !horizontal.isFacingRight())
-                spriteBatch.draw(spriteTexture, position.getX() + sprite.getRight(), position.getY() + sprite.getDown(),
+                spriteSink.addSprite(sprite.getPriority(), "sprites", sprite.getFileName(), position.getX() + sprite.getRight(), position.getY() + sprite.getDown(),
                         sprite.getLeft() - sprite.getRight(), sprite.getUp() - sprite.getDown());
             else
-                spriteBatch.draw(spriteTexture, position.getX() + sprite.getLeft(), position.getY() + sprite.getDown(),
+                spriteSink.addSprite(sprite.getPriority(), "sprites", sprite.getFileName(), position.getX() + sprite.getLeft(), position.getY() + sprite.getDown(),
                         sprite.getRight() - sprite.getLeft(), sprite.getUp() - sprite.getDown());
+        }
+    }
+
+    private void renderSprites() {
+        for (RenderableSprite sprite : sprites) {
+            sprite.render(spriteBatch);
+            sprite.freeObject();
         }
     }
 
     @Override
     public void destroy() {
+        for (Texture texture : tiledTextures.values())
+            texture.dispose();
+
         spriteBatch.dispose();
+    }
+
+    private interface RenderableSprite {
+        void render(SpriteBatch spriteBatch);
+
+        void freeObject();
+    }
+
+    private class NormalRenderableSprite implements RenderableSprite, Prioritable {
+        private String textureAtlasId;
+        private String texturePath;
+        private float x;
+        private float y;
+        private float width;
+        private float height;
+        private float priority;
+
+        @Override
+        public float getPriority() {
+            return priority;
+        }
+
+        @Override
+        public void render(SpriteBatch spriteBatch) {
+            TextureRegion textureRegion = textureAtlasProvider.getTexture(textureAtlasId, texturePath);
+            spriteBatch.draw(textureRegion, x, y, width, height);
+        }
+
+        @Override
+        public void freeObject() {
+            normalPool.free(this);
+        }
+    }
+
+    private class TiledRenderableSprite implements RenderableSprite, Prioritable {
+        private String texturePath;
+        private float x;
+        private float y;
+        private float width;
+        private float height;
+        private float tileCountX;
+        private float tileCountY;
+        private float priority;
+
+        @Override
+        public float getPriority() {
+            return priority;
+        }
+
+        @Override
+        public void render(SpriteBatch spriteBatch) {
+            spriteBatch.draw(getTexture(texturePath), x, y, width, height, 0, 0, tileCountX, tileCountY);
+        }
+
+        @Override
+        public void freeObject() {
+            tiledPool.free(this);
+        }
+    }
+
+    private Texture getTexture(String texturePath) {
+        Texture texture = tiledTextures.get(texturePath);
+        if (texture == null) {
+            texture = new Texture(Gdx.files.internal(texturePath));
+            texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+
+            tiledTextures.put(texturePath, texture);
+        }
+        return texture;
+    }
+
+    public interface SpriteSink {
+        void addSprite(float priority, String textureAtlasId, String texturePath,
+                       float x, float y, float width, float height);
+
+        void addTiledSprite(float priority, String texturePath,
+                            float x, float y, float width, float height,
+                            float tileCountX, float tileCountY);
+    }
+
+    private class SpriteSinkImpl implements SpriteSink {
+        @Override
+        public void addSprite(float priority, String textureAtlasId, String texturePath, float x, float y, float width, float height) {
+            NormalRenderableSprite sprite = normalPool.obtain();
+            sprite.priority = priority;
+            sprite.textureAtlasId = textureAtlasId;
+            sprite.texturePath = texturePath;
+            sprite.x = x;
+            sprite.y = y;
+            sprite.width = width;
+            sprite.height = height;
+            sprites.add(sprite);
+        }
+
+        @Override
+        public void addTiledSprite(float priority, String texturePath, float x, float y, float width, float height, float tileCountX, float tileCountY) {
+            TiledRenderableSprite sprite = tiledPool.obtain();
+            sprite.priority = priority;
+            sprite.texturePath = texturePath;
+            sprite.x = x;
+            sprite.y = y;
+            sprite.width = width;
+            sprite.height = height;
+            sprite.tileCountX = tileCountX;
+            sprite.tileCountY = tileCountY;
+            sprites.add(sprite);
+        }
+    }
+
+    private class NormalRenderableSpritePool extends Pool<NormalRenderableSprite> {
+        @Override
+        protected NormalRenderableSprite newObject() {
+            return new NormalRenderableSprite();
+        }
+    }
+
+    private class TiledRenderableSpritePool extends Pool<TiledRenderableSprite> {
+        @Override
+        protected TiledRenderableSprite newObject() {
+            return new TiledRenderableSprite();
+        }
     }
 }

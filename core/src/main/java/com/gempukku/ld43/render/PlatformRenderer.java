@@ -1,10 +1,5 @@
 package com.gempukku.ld43.render;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gempukku.ld43.model.GameScreenComponent;
 import com.gempukku.ld43.model.PlatformComponent;
 import com.gempukku.secsy.context.annotation.Inject;
@@ -15,58 +10,32 @@ import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.index.EntityIndex;
 import com.gempukku.secsy.entity.index.EntityIndexManager;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
-import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
+import com.gempukku.secsy.gaming.rendering.sprite.GatherSprites;
+import com.gempukku.secsy.gaming.rendering.sprite.SpriteRenderer;
 
 @RegisterSystem
 public class PlatformRenderer extends AbstractLifeCycleSystem {
     @Inject
     private EntityIndexManager entityIndexManager;
 
-    private Texture texture;
-    private SpriteBatch spriteBatch;
-
     private EntityIndex platformEntities;
 
     @Override
     public void initialize() {
-        spriteBatch = new SpriteBatch();
-
         platformEntities = entityIndexManager.addIndexOnComponents(PlatformComponent.class);
-
-        texture = new Texture(Gdx.files.internal("images/floor.png"));
-        texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
     }
 
     @ReceiveEvent
-    public void renderToPipeline(RenderToPipeline renderToPipeline, EntityRef cameraEntity, GameScreenComponent gameScreen) {
-        renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
-
-        Camera camera = renderToPipeline.getCamera();
-
-        spriteBatch.setProjectionMatrix(camera.combined);
-        spriteBatch.begin();
-        renderPlatforms();
-        spriteBatch.end();
-
-        renderToPipeline.getRenderPipeline().getCurrentBuffer().end();
-    }
-
-    private void renderPlatforms() {
+    public void renderPlatforms(GatherSprites gatherSprites, EntityRef cameraEntity, GameScreenComponent gameScreen) {
+        SpriteRenderer.SpriteSink spriteSink = gatherSprites.getSpriteSink();
         for (EntityRef platformEntity : platformEntities) {
             Position2DComponent position = platformEntity.getComponent(Position2DComponent.class);
             PlatformComponent platform = platformEntity.getComponent(PlatformComponent.class);
             float width = platform.getRight() - platform.getLeft();
             float height = platform.getUp() - platform.getDown();
-            TextureRegion floor = new TextureRegion(texture, 0, 0, width / height, 1);
-            spriteBatch.draw(floor, position.getX() + platform.getLeft(), position.getY() + platform.getDown(),
-                    width, height);
+            float x = position.getX() + platform.getLeft();
+            float y = position.getY() + platform.getDown();
+            spriteSink.addTiledSprite(5, "images/floor.png", x, y, width, height, width / height, 1);
         }
-
-    }
-
-    @Override
-    public void destroy() {
-        texture.dispose();
-        spriteBatch.dispose();
     }
 }
