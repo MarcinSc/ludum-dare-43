@@ -7,16 +7,24 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
+import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
+import com.gempukku.secsy.gaming.easing.EasingResolver;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderPipeline;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
+import com.gempukku.secsy.gaming.time.TimeManager;
 
 @RegisterSystem(
         profiles = "bloom")
 public class BloomPostProcessor extends AbstractLifeCycleSystem {
+    @Inject
+    private EasingResolver easingResolver;
+    @Inject
+    private TimeManager timeManager;
+
     private ShaderProgram shaderProgram;
     private VertexBufferObject vertexBufferObject;
     private IndexBufferObject indexBufferObject;
@@ -44,45 +52,54 @@ public class BloomPostProcessor extends AbstractLifeCycleSystem {
 
     @ReceiveEvent(priorityName = "gaming.renderer.bloom")
     public void render(RenderToPipeline renderToPipeline, EntityRef renderingEntity, BloomComponent bloom) {
-        float minimalBrightness = bloom.getMinimalBrightness();
-        if (minimalBrightness < 1) {
-            RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
+        long time = timeManager.getTime();
+        long effectStart = bloom.getEffectStart();
+        long effectDuration = bloom.getEffectDuration();
 
-            FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
+        if (effectStart <= time && time < effectStart + effectDuration) {
+            float alpha = 1f * (time - effectStart) / effectDuration;
+            float minimalBrightness = easingResolver.resolveValue(bloom.getMinimalBrightnessRecipe(), alpha) * bloom.getMinimalBrightnessMultiplier();
+            float blurRadius = easingResolver.resolveValue(bloom.getBlurRadiusRecipe(), alpha) * bloom.getBlurRadiusMultiplier();
+            float bloomStrength = easingResolver.resolveValue(bloom.getBloomStrengthRecipe(), alpha) * bloom.getBloomStrengthMultiplier();
+            if (minimalBrightness < 1 && bloomStrength > 0) {
+                RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
-            int width = currentBuffer.getWidth();
-            int height = currentBuffer.getHeight();
+                FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
 
-            FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+                int width = currentBuffer.getWidth();
+                int height = currentBuffer.getHeight();
 
-            newBuffer.begin();
+                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
 
-            shaderProgram.begin();
+                newBuffer.begin();
 
-            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                shaderProgram.begin();
 
-            vertexBufferObject.bind(shaderProgram);
-            indexBufferObject.bind();
+                Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + 0);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
+                vertexBufferObject.bind(shaderProgram);
+                indexBufferObject.bind();
 
-            shaderProgram.setUniformf("u_sourceTexture", 0);
-            shaderProgram.setUniformf("u_minimalBrightness", minimalBrightness);
-            shaderProgram.setUniformf("u_pixelSize", 1f / width, 1f / height);
-            shaderProgram.setUniformf("u_blurRadius", bloom.getBlurRadius());
-            shaderProgram.setUniformf("u_bloomStrength", bloom.getBloomStrength());
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + 0);
+                Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
 
-            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
-            vertexBufferObject.unbind(shaderProgram);
-            indexBufferObject.unbind();
+                shaderProgram.setUniformf("u_sourceTexture", 0);
+                shaderProgram.setUniformf("u_minimalBrightness", minimalBrightness);
+                shaderProgram.setUniformf("u_pixelSize", 1f / width, 1f / height);
+                shaderProgram.setUniformf("u_blurRadius", blurRadius);
+                shaderProgram.setUniformf("u_bloomStrength", bloomStrength);
 
-            shaderProgram.end();
+                Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+                vertexBufferObject.unbind(shaderProgram);
+                indexBufferObject.unbind();
 
-            newBuffer.end();
+                shaderProgram.end();
 
-            renderPipeline.returnFrameBuffer(currentBuffer);
-            renderPipeline.setCurrentBuffer(newBuffer);
+                newBuffer.end();
+
+                renderPipeline.returnFrameBuffer(currentBuffer);
+                renderPipeline.setCurrentBuffer(newBuffer);
+            }
         }
     }
 

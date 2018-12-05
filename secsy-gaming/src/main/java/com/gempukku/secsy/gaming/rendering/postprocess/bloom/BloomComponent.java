@@ -3,15 +3,35 @@ package com.gempukku.secsy.gaming.rendering.postprocess.bloom;
 import com.gempukku.secsy.entity.Component;
 
 public interface BloomComponent extends Component {
-    float getBlurRadius();
+    long getEffectStart();
 
-    void setBlurRadius(float blurRadius);
+    void setEffectStart(long effectStart);
 
-    float getMinimalBrightness();
+    long getEffectDuration();
 
-    void setMinimalBrightness(float minimalBrightness);
+    void setEffectDuration(long effectDuration);
 
-    float getBloomStrength();
+    String getBlurRadiusRecipe();
 
-    void setBloomStrength(float bloomStrength);
+    void setBlurRadiusRecipe(String blurRadiusRecipe);
+
+    float getBlurRadiusMultiplier();
+
+    void setBlurRadiusMultiplier(float blurRadiusMultiplier);
+
+    String getMinimalBrightnessRecipe();
+
+    void setMinimalBrightnessRecipe(String minimalBrightnessRecipe);
+
+    float getMinimalBrightnessMultiplier();
+
+    void setMinimalBrightnessMultiplier(float minimalBrightnessMultiplier);
+
+    String getBloomStrengthRecipe();
+
+    void setBloomStrengthRecipe(String bloomStrengthRecipe);
+
+    float getBloomStrengthMultiplier();
+
+    void setBloomStrengthMultiplier(float bloomStrengthMultiplier);
 }
