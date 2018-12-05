@@ -17,17 +17,11 @@ import java.util.*;
         profiles = "textureAtlas", shared = TextureAtlasProvider.class)
 public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem implements TextureAtlasProvider {
     @Inject(optional = true)
-    private TextureParametersProvider textureParametersProvider;
+    private TextureParametersProvider textureParametersProvider = new DefaultTextureParametersProvider();
 
     private Map<String, PixmapPacker> packers = new HashMap<String, PixmapPacker>();
     private Map<String, TextureAtlas> textureAtlases = new HashMap<String, TextureAtlas>();
     private Map<String, Map<String, TextureRegion>> textures = new HashMap<String, Map<String, TextureRegion>>();
-
-    @Override
-    public void postInitialize() {
-        if (textureParametersProvider == null)
-            textureParametersProvider = new DefaultTextureParametersProvider();
-    }
 
     @Override
     public List<Texture> getTextures(String textureAtlasId) {
