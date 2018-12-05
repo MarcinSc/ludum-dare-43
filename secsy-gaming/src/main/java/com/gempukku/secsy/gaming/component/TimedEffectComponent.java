@@ -1,8 +1,8 @@
-package com.gempukku.secsy.gaming.rendering.postprocess;
+package com.gempukku.secsy.gaming.component;
 
 import com.gempukku.secsy.entity.Component;
 
-public interface PostProcessEffectComponent extends Component {
+public interface TimedEffectComponent extends Component {
     long getEffectStart();
 
     void setEffectStart(long effectStart);

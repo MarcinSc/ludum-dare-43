@@ -1,9 +1,9 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.bloom;
 
+import com.gempukku.secsy.gaming.component.TimedEffectComponent;
 import com.gempukku.secsy.gaming.easing.EasedValue;
-import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface BloomComponent extends PostProcessEffectComponent {
+public interface BloomComponent extends TimedEffectComponent {
     EasedValue getBlurRadius();
 
     void setBlurRadius(EasedValue easedValue);

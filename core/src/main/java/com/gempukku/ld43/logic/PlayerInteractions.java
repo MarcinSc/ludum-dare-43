@@ -10,6 +10,7 @@ import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.audio.AudioManager;
 import com.gempukku.secsy.gaming.camera2d.component.ScreenShakeCameraComponent;
+import com.gempukku.secsy.gaming.easing.EasedValue;
 import com.gempukku.secsy.gaming.input2d.EntityJumped;
 import com.gempukku.secsy.gaming.physics.basic2d.EntityCollided;
 import com.gempukku.secsy.gaming.rendering.pipeline.CameraEntityProvider;
@@ -47,10 +48,10 @@ public class PlayerInteractions extends AbstractLifeCycleSystem {
             EntityRef cameraEntity = cameraEntityProvider.getCameraEntity();
             ScreenShakeCameraComponent screenShake = cameraEntity.getComponent(ScreenShakeCameraComponent.class);
             long time = timeManager.getTime();
-            screenShake.setShakeStartTime(time);
-            screenShake.setShakeEndTime(time + 500);
-            screenShake.setShakeSize(0.05f);
-            screenShake.setShakeSpeed(0.01f);
+            screenShake.setEffectStart(time);
+            screenShake.setEffectDuration(500);
+            screenShake.setShakeSize(new EasedValue(0.05f, "pow5,0-1-0"));
+            screenShake.setShakeSpeed(new EasedValue(0.01f));
             cameraEntity.saveChanges();
         }
     }

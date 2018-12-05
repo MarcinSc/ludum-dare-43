@@ -6,6 +6,7 @@ import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.camera2d.Adjust2dCamera;
 import com.gempukku.secsy.gaming.camera2d.component.ScreenShakeCameraComponent;
+import com.gempukku.secsy.gaming.easing.EasedValue;
 import com.gempukku.secsy.gaming.easing.EasingResolver;
 import com.gempukku.secsy.gaming.noise.ImprovedNoise;
 import com.gempukku.secsy.gaming.time.TimeManager;
@@ -14,7 +15,7 @@ import static com.gempukku.secsy.gaming.camera2d.Camera2DProvider.CAMERA_2D_PROF
 
 @RegisterSystem(profiles = CAMERA_2D_PROFILE)
 public class ScreenShakeCamera {
-    public static final String DEFAULT_EASING_RECIPE = "pow5,0-1-0";
+    public static final EasedValue DEFAULT_SHAKE_SIZE = new EasedValue(0.1f, "pow5,0-1-0");
 
     @Inject
     private TimeManager timeManager;
@@ -25,26 +26,23 @@ public class ScreenShakeCamera {
     public void shakeCamera(Adjust2dCamera cameraLocation, EntityRef cameraEntity, ScreenShakeCameraComponent shakeCamera) {
         long time = timeManager.getTime();
 
-        long shakeStartTime = shakeCamera.getShakeStartTime();
-        long shakeEndTime = shakeCamera.getShakeEndTime();
-        if (time > shakeStartTime && time < shakeEndTime) {
-            long shakeDuration = shakeEndTime - shakeStartTime;
-            float shakeSpeed = shakeCamera.getShakeSpeed();
+        long effectStart = shakeCamera.getEffectStart();
+        long effectDuration = shakeCamera.getEffectDuration();
+        if (effectStart <= time && time < effectStart + effectDuration) {
+            float alpha = 1f * (time - effectStart) / effectDuration;
+            float shakeSpeed = easingResolver.resolveValue(shakeCamera.getShakeSpeed(), alpha);
 
-            float shakeScaleGeneral = shakeCamera.getShakeSize();
-            String shakeEasingRecipe = shakeCamera.getShakeEasingRecipe();
-            if (shakeEasingRecipe == null)
-                shakeEasingRecipe = DEFAULT_EASING_RECIPE;
+            EasedValue shakeSizeValue = shakeCamera.getShakeSize();
+            if (shakeSizeValue == null)
+                shakeSizeValue = DEFAULT_SHAKE_SIZE;
+            float shakeSize = easingResolver.resolveValue(shakeSizeValue, alpha);
 
             float noiseX = (float) ImprovedNoise.noise(time * shakeSpeed, 0, 0);
             float noiseY = (float) ImprovedNoise.noise((time + 5000) * shakeSpeed, 0, 0);
 
-            float timeElement = 1f * (time - shakeStartTime) / shakeDuration;
-            float shakeScaleFromTime = easingResolver.resolveValue(shakeEasingRecipe, timeElement);
-
             float sizeMultiplier = Math.min(cameraLocation.getViewportWidth(), cameraLocation.getViewportHeight());
-            float totalShakeX = noiseX * shakeScaleGeneral * shakeScaleFromTime;
-            float totalShakeY = noiseY * shakeScaleGeneral * shakeScaleFromTime;
+            float totalShakeX = noiseX * shakeSize;
+            float totalShakeY = noiseY * shakeSize;
 
             cameraLocation.setNonLastingX(totalShakeX * sizeMultiplier);
             cameraLocation.setNonLastingY(totalShakeY * sizeMultiplier);
