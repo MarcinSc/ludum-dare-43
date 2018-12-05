@@ -37,8 +37,8 @@ public class ScreenShakeCamera {
                 shakeSizeValue = DEFAULT_SHAKE_SIZE;
             float shakeSize = easingResolver.resolveValue(shakeSizeValue, alpha);
 
-            float noiseX = (float) ImprovedNoise.noise(time * shakeSpeed, 0, 0);
-            float noiseY = (float) ImprovedNoise.noise((time + 5000) * shakeSpeed, 0, 0);
+            float noiseX = ImprovedNoise.noise(time * shakeSpeed, 0, 0);
+            float noiseY = ImprovedNoise.noise((time + 5000) * shakeSpeed, 0, 0);
 
             float sizeMultiplier = Math.min(cameraLocation.getViewportWidth(), cameraLocation.getViewportHeight());
             float totalShakeX = noiseX * shakeSize;
