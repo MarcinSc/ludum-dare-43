@@ -33,6 +33,8 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
     private SpriteBatch spriteBatch;
 
     private EntityIndex spriteEntities;
+    private EntityIndex tiledSpriteEntities;
+
     private PriorityCollection<RenderableSprite> sprites = new PriorityCollection<RenderableSprite>();
     private SpriteSinkImpl spriteSink = new SpriteSinkImpl();
 
@@ -46,6 +48,7 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
         spriteBatch = new SpriteBatch();
 
         spriteEntities = entityIndexManager.addIndexOnComponents(SpriteComponent.class);
+        tiledSpriteEntities = entityIndexManager.addIndexOnComponents(TiledSpriteComponent.class);
     }
 
     @ReceiveEvent(priorityName = "gaming.renderer.sprites")
@@ -82,6 +85,18 @@ public class SpriteRenderer extends AbstractLifeCycleSystem {
             else
                 spriteSink.addSprite(sprite.getPriority(), "sprites", sprite.getFileName(), position.getX() + sprite.getLeft(), position.getY() + sprite.getDown(),
                         sprite.getRight() - sprite.getLeft(), sprite.getUp() - sprite.getDown());
+        }
+        for (EntityRef tiledSpriteEntity : tiledSpriteEntities) {
+            Position2DComponent position = tiledSpriteEntity.getComponent(Position2DComponent.class);
+            TiledSpriteComponent sprite = tiledSpriteEntity.getComponent(TiledSpriteComponent.class);
+            HorizontalOrientationComponent horizontal = tiledSpriteEntity.getComponent(HorizontalOrientationComponent.class);
+
+            if (horizontal != null && !horizontal.isFacingRight())
+                spriteSink.addTiledSprite(sprite.getPriority(), sprite.getFileName(), position.getX() + sprite.getRight(), position.getY() + sprite.getDown(),
+                        sprite.getLeft() - sprite.getRight(), sprite.getUp() - sprite.getDown(), sprite.getTileXCount(), sprite.getTileYCount());
+            else
+                spriteSink.addTiledSprite(sprite.getPriority(), sprite.getFileName(), position.getX() + sprite.getLeft(), position.getY() + sprite.getDown(),
+                        sprite.getRight() - sprite.getLeft(), sprite.getUp() - sprite.getDown(), sprite.getTileXCount(), sprite.getTileYCount());
         }
     }
 

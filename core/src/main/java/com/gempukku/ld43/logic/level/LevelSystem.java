@@ -18,6 +18,7 @@ import com.gempukku.secsy.gaming.physics.basic2d.SensorContactBegin;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorTriggerComponent;
 import com.gempukku.secsy.gaming.rendering.pipeline.CameraEntityProvider;
 import com.gempukku.secsy.gaming.rendering.postprocess.tint.color.ColorTintComponent;
+import com.gempukku.secsy.gaming.rendering.sprite.TiledSpriteComponent;
 import com.gempukku.secsy.gaming.time.TimeEntityProvider;
 import com.gempukku.secsy.gaming.time.TimeManager;
 import com.gempukku.secsy.gaming.time.delay.DelayManager;
@@ -192,6 +193,11 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         PlatformComponent platform = platformEntity.getComponent(PlatformComponent.class);
         platform.setRight(width);
         platform.setUp(height);
+
+        TiledSpriteComponent tiledSprite = platformEntity.getComponent(TiledSpriteComponent.class);
+        tiledSprite.setRight(width);
+        tiledSprite.setUp(height);
+        tiledSprite.setTileXCount(width / height);
 
         DustLayerComponent dustLayer = platformEntity.getComponent(DustLayerComponent.class);
         if (dustLayer != null) {

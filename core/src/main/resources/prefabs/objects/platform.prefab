@@ -3,5 +3,10 @@
   "Obstacle": {},
   "Ground": {},
   "SensorTrigger": {},
-  "Platform": {}
+  "Platform": {},
+  "TiledSprite": {
+    "fileName": "images/floor.png",
+    "priority": 5,
+    "tileYCount": 1
+  }
 }

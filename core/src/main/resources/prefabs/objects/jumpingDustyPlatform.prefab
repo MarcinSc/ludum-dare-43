@@ -4,6 +4,11 @@
   "Ground": {},
   "SensorTrigger": {},
   "Platform": {},
+  "TiledSprite": {
+    "fileName": "images/floor.png",
+    "priority": 5,
+    "tileYCount": 1
+  },
   "DustLayer": {
     "dustGrowthPerSecond": 2,
     "dustColor": "0,0,255",
