@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.google.common.collect.Iterables;
@@ -15,9 +16,18 @@ import java.util.*;
 @RegisterSystem(
         profiles = "textureAtlas", shared = TextureAtlasProvider.class)
 public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem implements TextureAtlasProvider {
+    @Inject(optional = true)
+    private TextureParametersProvider textureParametersProvider;
+
     private Map<String, PixmapPacker> packers = new HashMap<String, PixmapPacker>();
     private Map<String, TextureAtlas> textureAtlases = new HashMap<String, TextureAtlas>();
     private Map<String, Map<String, TextureRegion>> textures = new HashMap<String, Map<String, TextureRegion>>();
+
+    @Override
+    public void postInitialize() {
+        if (textureParametersProvider == null)
+            textureParametersProvider = new DefaultTextureParametersProvider();
+    }
 
     @Override
     public List<Texture> getTextures(String textureAtlasId) {
@@ -33,8 +43,10 @@ public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem impleme
     public TextureRegion getTexture(String textureAtlasId, String name) {
         Map<String, TextureRegion> textureRegionMap = textures.get(textureAtlasId);
         if (textureRegionMap == null) {
-            PixmapPacker packer = new PixmapPacker(512, 512, Pixmap.Format.RGBA8888, 2, false);
-            packer.setDuplicateBorder(true);
+            PixmapPacker packer = new PixmapPacker(
+                    textureParametersProvider.getPageWidth(textureAtlasId), textureParametersProvider.getPageHeight(textureAtlasId),
+                    textureParametersProvider.getFormat(textureAtlasId), textureParametersProvider.getPadding(textureAtlasId),
+                    textureParametersProvider.getDuplicateBorder(textureAtlasId));
             packers.put(textureAtlasId, packer);
             TextureAtlas textureAtlas = new TextureAtlas();
             textureAtlases.put(textureAtlasId, textureAtlas);
@@ -47,7 +59,9 @@ public class DynamicTextureAtlasProvider extends AbstractLifeCycleSystem impleme
             TextureAtlas textureAtlas = textureAtlases.get(textureAtlasId);
             PixmapPacker packer = packers.get(textureAtlasId);
             packer.pack(name, new Pixmap(Gdx.files.internal(name)));
-            packer.updateTextureAtlas(textureAtlas, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false);
+            packer.updateTextureAtlas(textureAtlas,
+                    textureParametersProvider.getMinTextureFilter(textureAtlasId), textureParametersProvider.getMagTextureFilter(textureAtlasId),
+                    textureParametersProvider.getUseMipMaps(textureAtlasId));
             textureRegion = textureAtlas.findRegion(name);
             textureRegionMap.put(name, textureRegion);
         }
