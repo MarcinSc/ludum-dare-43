@@ -23,7 +23,10 @@
     "partOfScreenItShouldTake": 0.1
   },
   "ColorTint": {
+    "effectStart": 0,
+    "effectDuration": 1000,
     "color": "0,0,0",
-    "factor": 1
+    "factorRecipe": "1-0",
+    "factorMultiplier": 1
   }
 }

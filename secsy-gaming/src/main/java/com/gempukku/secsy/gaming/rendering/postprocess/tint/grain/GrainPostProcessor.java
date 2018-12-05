@@ -66,8 +66,6 @@ public class GrainPostProcessor extends AbstractLifeCycleSystem {
 
             shaderProgram.begin();
 
-            Gdx.gl20.glEnable(GL20.GL_BLEND);
-
             vertexBufferObject.bind(shaderProgram);
             indexBufferObject.bind();
 

@@ -11,7 +11,6 @@ import com.gempukku.secsy.entity.EntityManager;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.game.GameEntityProvider;
-import com.gempukku.secsy.entity.game.GameLoopUpdate;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.ObstacleComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorContactBegin;
@@ -47,33 +46,9 @@ public class LevelSystem extends AbstractLifeCycleSystem {
     @Inject
     private TimeManager timeManager;
 
-    private long startTime;
-    private long completionTime = -10000;
-
-    @ReceiveEvent
-    public void adjustCameraTint(GameLoopUpdate gameLoop, EntityRef game, GameScreenComponent gameScreen) {
-        EntityRef camera = cameraEntityProvider.getCameraEntity();
-        ColorTintComponent colorTint = camera.getComponent(ColorTintComponent.class);
-
-        long time = timeManager.getTime();
-        if (completionTime <= time && time < completionTime + 2000) {
-            if (time < completionTime + 1000)
-                colorTint.setFactor((time - completionTime) / 1000f);
-            else
-                colorTint.setFactor((completionTime + 2000 - time) / 1000f);
-            camera.saveChanges();
-        } else if (time < startTime + 1000) {
-            colorTint.setFactor((startTime + 1000 - time) / 1000f);
-            camera.saveChanges();
-        } else {
-            colorTint.setFactor(0);
-            camera.saveChanges();
-        }
-    }
 
     @ReceiveEvent
     public void gameStarted(GameStarted gameStarted, EntityRef gameEntity, LevelComponent level) {
-        startTime = timeManager.getTime();
         loadLevel("levels/level" + level.getLevelIndex() + ".json");
     }
 
@@ -94,17 +69,26 @@ public class LevelSystem extends AbstractLifeCycleSystem {
             level.setLevelIndex(level.getLevelIndex() + 1);
             gameEntity.saveChanges();
 
-            completionTime = timeManager.getTime();
+            dimCamera();
 
             delayManager.addDelayedAction(gameEntity, "loadLevel", 1000);
         }
+    }
+
+    private void dimCamera() {
+        EntityRef cameraEntity = cameraEntityProvider.getCameraEntity();
+        ColorTintComponent colorTint = cameraEntity.getComponent(ColorTintComponent.class);
+        colorTint.setEffectStart(timeManager.getTime());
+        colorTint.setEffectDuration(2000);
+        colorTint.setFactorRecipe("0-1-0");
+        cameraEntity.saveChanges();
     }
 
     @ReceiveEvent
     public void playerDied(PlayerDied playerDied, EntityRef entity) {
         entityManager.destroyEntity(entity);
 
-        completionTime = timeManager.getTime();
+        dimCamera();
 
         EntityRef gameEntity = gameEntityProvider.getGameEntity();
         delayManager.addDelayedAction(gameEntity, "loadLevel", 1000);

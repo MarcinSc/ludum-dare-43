@@ -4,11 +4,23 @@ import com.badlogic.gdx.graphics.Color;
 import com.gempukku.secsy.entity.Component;
 
 public interface ColorTintComponent extends Component {
+    long getEffectStart();
+
+    void setEffectStart(long effectStart);
+
+    long getEffectDuration();
+
+    void setEffectDuration(long effectDuration);
+
     Color getColor();
 
     void setColor(Color color);
 
-    float getFactor();
+    String getFactorRecipe();
 
-    void setFactor(float factor);
+    void setFactorRecipe(String factorRecipe);
+
+    float getFactorMultiplier();
+
+    void setFactorMultiplier(float factorMultiplier);
 }
