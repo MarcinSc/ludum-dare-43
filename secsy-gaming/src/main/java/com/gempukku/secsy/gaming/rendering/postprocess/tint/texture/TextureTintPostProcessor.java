@@ -14,8 +14,10 @@ import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.asset.texture.TextureAtlasProvider;
+import com.gempukku.secsy.gaming.easing.EasingResolver;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderPipeline;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
+import com.gempukku.secsy.gaming.time.TimeManager;
 
 import java.util.Random;
 
@@ -24,6 +26,10 @@ import java.util.Random;
 public class TextureTintPostProcessor extends AbstractLifeCycleSystem {
     @Inject
     private TextureAtlasProvider textureAtlasProvider;
+    @Inject
+    private EasingResolver easingResolver;
+    @Inject
+    private TimeManager timeManager;
 
     private ShaderProgram shaderProgram;
     private VertexBufferObject vertexBufferObject;
@@ -54,52 +60,58 @@ public class TextureTintPostProcessor extends AbstractLifeCycleSystem {
 
     @ReceiveEvent(priorityName = "gaming.renderer.tint.texture")
     public void render(RenderToPipeline renderToPipeline, EntityRef renderingEntity, TextureTintComponent tint) {
-        float factor = tint.getFactor();
+        long time = timeManager.getTime();
+        long effectStart = tint.getEffectStart();
+        long effectDuration = tint.getEffectDuration();
 
-        if (factor > 0) {
-            RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
+        if (effectStart <= time && time < effectStart + effectDuration) {
+            float alpha = 1f * (time - effectStart) / effectDuration;
+            float factor = easingResolver.resolveValue(tint.getAlpha(), alpha);
+            if (factor > 0) {
+                RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
-            FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
+                FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
 
-            int width = currentBuffer.getWidth();
-            int height = currentBuffer.getHeight();
+                int width = currentBuffer.getWidth();
+                int height = currentBuffer.getHeight();
 
-            FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
 
-            newBuffer.begin();
+                newBuffer.begin();
 
-            shaderProgram.begin();
+                shaderProgram.begin();
 
-            vertexBufferObject.bind(shaderProgram);
-            indexBufferObject.bind();
+                vertexBufferObject.bind(shaderProgram);
+                indexBufferObject.bind();
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+                Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
 
-            TextureRegion texture = textureAtlasProvider.getTexture(tint.getTextureAtlasId(), tint.getTextureName());
+                TextureRegion texture = textureAtlasProvider.getTexture(tint.getTextureAtlasId(), tint.getTextureName());
 
-            int tintTextureHandle = texture.getTexture().getTextureObjectHandle();
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, tintTextureHandle);
+                int tintTextureHandle = texture.getTexture().getTextureObjectHandle();
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+                Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, tintTextureHandle);
 
-            shaderProgram.setUniformf("u_sourceTexture", 0);
-            shaderProgram.setUniformf("u_tintTexture", 1);
-            shaderProgram.setUniformf("u_factor", factor);
-            shaderProgram.setUniformf("u_tintTextureOrigin", texture.getU(), texture.getV());
-            shaderProgram.setUniformf("u_tintTextureSize", texture.getU2() - texture.getU(), texture.getV2() - texture.getV());
-            shaderProgram.setUniformf("u_tintShift", 0, 0);
-            shaderProgram.setUniformf("u_repeatFactor", 1, 1);
+                shaderProgram.setUniformf("u_sourceTexture", 0);
+                shaderProgram.setUniformf("u_tintTexture", 1);
+                shaderProgram.setUniformf("u_factor", factor);
+                shaderProgram.setUniformf("u_tintTextureOrigin", texture.getU(), texture.getV());
+                shaderProgram.setUniformf("u_tintTextureSize", texture.getU2() - texture.getU(), texture.getV2() - texture.getV());
+                shaderProgram.setUniformf("u_tintShift", 0, 0);
+                shaderProgram.setUniformf("u_repeatFactor", 1, 1);
 
-            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
-            vertexBufferObject.unbind(shaderProgram);
-            indexBufferObject.unbind();
+                Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+                vertexBufferObject.unbind(shaderProgram);
+                indexBufferObject.unbind();
 
-            shaderProgram.end();
+                shaderProgram.end();
 
-            newBuffer.end();
+                newBuffer.end();
 
-            renderPipeline.returnFrameBuffer(currentBuffer);
-            renderPipeline.setCurrentBuffer(newBuffer);
+                renderPipeline.returnFrameBuffer(currentBuffer);
+                renderPipeline.setCurrentBuffer(newBuffer);
+            }
         }
     }
 

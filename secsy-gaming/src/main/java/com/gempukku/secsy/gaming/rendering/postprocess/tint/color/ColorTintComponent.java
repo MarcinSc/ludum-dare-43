@@ -1,26 +1,15 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.tint.color;
 
 import com.badlogic.gdx.graphics.Color;
-import com.gempukku.secsy.entity.Component;
+import com.gempukku.secsy.gaming.easing.EasedValue;
+import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface ColorTintComponent extends Component {
-    long getEffectStart();
-
-    void setEffectStart(long effectStart);
-
-    long getEffectDuration();
-
-    void setEffectDuration(long effectDuration);
-
+public interface ColorTintComponent extends PostProcessEffectComponent {
     Color getColor();
 
     void setColor(Color color);
 
-    String getFactorRecipe();
+    EasedValue getAlpha();
 
-    void setFactorRecipe(String factorRecipe);
-
-    float getFactorMultiplier();
-
-    void setFactorMultiplier(float factorMultiplier);
+    void setAlpha(EasedValue easedValue);
 }

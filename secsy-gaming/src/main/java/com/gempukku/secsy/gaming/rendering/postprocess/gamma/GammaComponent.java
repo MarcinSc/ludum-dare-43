@@ -1,21 +1,10 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.gamma;
 
-import com.gempukku.secsy.entity.Component;
+import com.gempukku.secsy.gaming.easing.EasedValue;
+import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface GammaComponent extends Component {
-    long getEffectStart();
+public interface GammaComponent extends PostProcessEffectComponent {
+    EasedValue getGammaFactor();
 
-    void setEffectStart(long effectStart);
-
-    long getEffectDuration();
-
-    void setEffectDuration(long effectDuration);
-
-    String getFactorRecipe();
-
-    void setFactorRecipe(String factorRecipe);
-
-    float getFactorMultiplier();
-
-    void setFactorMultiplier(float factorMultiplier);
+    void setGammaFactor(EasedValue easedValue);
 }

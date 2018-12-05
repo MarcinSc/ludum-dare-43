@@ -1,13 +1,14 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.tint.grain;
 
-import com.gempukku.secsy.entity.Component;
+import com.gempukku.secsy.gaming.easing.EasedValue;
+import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface GrainComponent extends Component {
-    float getGrainSize();
+public interface GrainComponent extends PostProcessEffectComponent {
+    EasedValue getGrainSize();
 
-    void setGrainSize(float grainSize);
+    void setGrainSize(EasedValue easedValue);
 
-    float getFactor();
+    EasedValue getAlpha();
 
-    void setFactor(float factor);
+    void setAlpha(EasedValue easedValue);
 }

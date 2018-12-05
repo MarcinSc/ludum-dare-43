@@ -62,7 +62,7 @@ public class GaussianBlurPostProcessor extends AbstractLifeCycleSystem {
 
         if (effectStart <= time && time < effectStart + effectDuration) {
             float alpha = 1f * (time - effectStart) / effectDuration;
-            int blurRadius = MathUtils.round(easingResolver.resolveValue(blur.getBlurRadiusRecipe(), alpha) * blur.getBlurRadiusMultiplier());
+            int blurRadius = MathUtils.round(easingResolver.resolveValue(blur.getBlurRadius(), alpha));
             if (blurRadius > 0) {
                 float[] kernel = getKernel(blurRadius);
                 RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();

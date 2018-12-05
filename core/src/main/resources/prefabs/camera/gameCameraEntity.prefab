@@ -26,7 +26,6 @@
     "effectStart": 0,
     "effectDuration": 1000,
     "color": "0,0,0",
-    "factorRecipe": "1-0",
-    "factorMultiplier": 1
+    "alpha": "1*1-0"
   }
 }

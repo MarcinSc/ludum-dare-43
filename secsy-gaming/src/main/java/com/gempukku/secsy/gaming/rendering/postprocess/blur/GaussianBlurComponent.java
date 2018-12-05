@@ -1,21 +1,10 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.blur;
 
-import com.gempukku.secsy.entity.Component;
+import com.gempukku.secsy.gaming.easing.EasedValue;
+import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface GaussianBlurComponent extends Component {
-    long getEffectStart();
+public interface GaussianBlurComponent extends PostProcessEffectComponent {
+    EasedValue getBlurRadius();
 
-    void setEffectStart(long effectStart);
-
-    long getEffectDuration();
-
-    void setEffectDuration(long effectDuration);
-
-    String getBlurRadiusRecipe();
-
-    void setBlurRadiusRecipe(String blurRadiusRecipe);
-
-    float getBlurRadiusMultiplier();
-
-    void setBlurRadiusMultiplier(float blurRadiusMultiplier);
+    void setBlurRadius(EasedValue easedValue);
 }

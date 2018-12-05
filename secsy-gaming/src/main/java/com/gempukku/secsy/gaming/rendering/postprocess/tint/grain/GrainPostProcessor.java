@@ -7,12 +7,15 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
+import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
 import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
+import com.gempukku.secsy.gaming.easing.EasingResolver;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderPipeline;
 import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
+import com.gempukku.secsy.gaming.time.TimeManager;
 
 import java.util.Random;
 
@@ -20,6 +23,11 @@ import java.util.Random;
         profiles = "grainPostProcessor"
 )
 public class GrainPostProcessor extends AbstractLifeCycleSystem {
+    @Inject
+    private EasingResolver easingResolver;
+    @Inject
+    private TimeManager timeManager;
+
     private ShaderProgram shaderProgram;
     private VertexBufferObject vertexBufferObject;
     private IndexBufferObject indexBufferObject;
@@ -49,44 +57,51 @@ public class GrainPostProcessor extends AbstractLifeCycleSystem {
 
     @ReceiveEvent(priorityName = "gaming.renderer.tint.grain")
     public void render(RenderToPipeline renderToPipeline, EntityRef renderingEntity, GrainComponent tint) {
-        float factor = tint.getFactor();
+        long time = timeManager.getTime();
+        long effectStart = tint.getEffectStart();
+        long effectDuration = tint.getEffectDuration();
 
-        if (factor > 0) {
-            RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
+        if (effectStart <= time && time < effectStart + effectDuration) {
+            float alpha = 1f * (time - effectStart) / effectDuration;
+            float factor = easingResolver.resolveValue(tint.getAlpha(), alpha);
+            if (factor > 0) {
+                float grainSize = easingResolver.resolveValue(tint.getGrainSize(), alpha);
 
-            FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
+                RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
-            int width = currentBuffer.getWidth();
-            int height = currentBuffer.getHeight();
-            float grainSize = 1f * tint.getGrainSize();
+                FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
 
-            FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+                int width = currentBuffer.getWidth();
+                int height = currentBuffer.getHeight();
 
-            newBuffer.begin();
+                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
 
-            shaderProgram.begin();
+                newBuffer.begin();
 
-            vertexBufferObject.bind(shaderProgram);
-            indexBufferObject.bind();
+                shaderProgram.begin();
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + 0);
-            Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
+                vertexBufferObject.bind(shaderProgram);
+                indexBufferObject.bind();
 
-            shaderProgram.setUniformf("u_sourceTexture", 0);
-            shaderProgram.setUniformf("u_factor", factor);
-            shaderProgram.setUniformf("u_size", grainSize / width, grainSize / height);
-            shaderProgram.setUniformf("u_random", rnd.nextFloat(), rnd.nextFloat());
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+                Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
 
-            Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
-            vertexBufferObject.unbind(shaderProgram);
-            indexBufferObject.unbind();
+                shaderProgram.setUniformf("u_sourceTexture", 0);
+                shaderProgram.setUniformf("u_factor", factor);
+                shaderProgram.setUniformf("u_size", grainSize / width, grainSize / height);
+                shaderProgram.setUniformf("u_random", rnd.nextFloat(), rnd.nextFloat());
 
-            shaderProgram.end();
+                Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+                vertexBufferObject.unbind(shaderProgram);
+                indexBufferObject.unbind();
 
-            newBuffer.end();
+                shaderProgram.end();
 
-            renderPipeline.returnFrameBuffer(currentBuffer);
-            renderPipeline.setCurrentBuffer(newBuffer);
+                newBuffer.end();
+
+                renderPipeline.returnFrameBuffer(currentBuffer);
+                renderPipeline.setCurrentBuffer(newBuffer);
+            }
         }
     }
 

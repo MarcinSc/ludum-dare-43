@@ -12,6 +12,7 @@ import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.entity.game.GameEntityProvider;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
+import com.gempukku.secsy.gaming.easing.EasedValue;
 import com.gempukku.secsy.gaming.physics.basic2d.ObstacleComponent;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorContactBegin;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorTriggerComponent;
@@ -80,7 +81,7 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         ColorTintComponent colorTint = cameraEntity.getComponent(ColorTintComponent.class);
         colorTint.setEffectStart(timeManager.getTime());
         colorTint.setEffectDuration(2000);
-        colorTint.setFactorRecipe("0-1-0");
+        colorTint.setAlpha(new EasedValue(1, "0-1-0"));
         cameraEntity.saveChanges();
     }
 

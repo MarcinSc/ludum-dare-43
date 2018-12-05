@@ -1,12 +1,18 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.tint.texture;
 
-import com.gempukku.secsy.entity.Component;
+import com.gempukku.secsy.gaming.easing.EasedValue;
+import com.gempukku.secsy.gaming.rendering.postprocess.PostProcessEffectComponent;
 
-public interface TextureTintComponent extends Component {
+public interface TextureTintComponent extends PostProcessEffectComponent {
     String getTextureAtlasId();
+
+    void setTextureAtlasId(String textureAtlasId);
 
     String getTextureName();
 
-    float getFactor();
-    void setFactor(float factor);
+    void setTextureName(String textureName);
+
+    EasedValue getAlpha();
+
+    void setAlpha(EasedValue easedValue);
 }

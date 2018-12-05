@@ -58,7 +58,7 @@ public class GammaPostProcessor extends AbstractLifeCycleSystem {
 
         if (effectStart <= time && time < effectStart + effectDuration) {
             float alpha = 1f * (time - effectStart) / effectDuration;
-            float factor = easingResolver.resolveValue(gamma.getFactorRecipe(), alpha) * gamma.getFactorMultiplier();
+            float factor = easingResolver.resolveValue(gamma.getGammaFactor(), alpha);
 
             if (factor > 0) {
                 RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();

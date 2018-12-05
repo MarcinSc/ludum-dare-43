@@ -84,6 +84,13 @@ public class ReflectionsEasingResolver extends AbstractLifeCycleSystem implement
         return result;
     }
 
+    @Override
+    public float resolveValue(EasedValue easedValue, float value) {
+        if (easedValue.getRecipe() == null)
+            return easedValue.getMultiplier();
+        return easedValue.getMultiplier() * resolveValue(easedValue.getRecipe(), value);
+    }
+
     private class InterpolationEasingFunction implements EasingFunction {
         private String trigger;
         private Interpolation interpolation;

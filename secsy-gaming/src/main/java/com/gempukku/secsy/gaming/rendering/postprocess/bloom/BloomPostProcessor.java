@@ -58,9 +58,9 @@ public class BloomPostProcessor extends AbstractLifeCycleSystem {
 
         if (effectStart <= time && time < effectStart + effectDuration) {
             float alpha = 1f * (time - effectStart) / effectDuration;
-            float minimalBrightness = easingResolver.resolveValue(bloom.getMinimalBrightnessRecipe(), alpha) * bloom.getMinimalBrightnessMultiplier();
-            float blurRadius = easingResolver.resolveValue(bloom.getBlurRadiusRecipe(), alpha) * bloom.getBlurRadiusMultiplier();
-            float bloomStrength = easingResolver.resolveValue(bloom.getBloomStrengthRecipe(), alpha) * bloom.getBloomStrengthMultiplier();
+            float minimalBrightness = easingResolver.resolveValue(bloom.getMinimalBrightness(), alpha);
+            float blurRadius = easingResolver.resolveValue(bloom.getBlurRadius(), alpha);
+            float bloomStrength = easingResolver.resolveValue(bloom.getBloomStrength(), alpha);
             if (minimalBrightness < 1 && bloomStrength > 0) {
                 RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 

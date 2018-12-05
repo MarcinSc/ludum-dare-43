@@ -59,7 +59,7 @@ public class ColorTintPostProcessor extends AbstractLifeCycleSystem {
 
         if (effectStart <= time && time < effectStart + effectDuration) {
             float alpha = 1f * (time - effectStart) / effectDuration;
-            float factor = easingResolver.resolveValue(tint.getFactorRecipe(), alpha) * tint.getFactorMultiplier();
+            float factor = easingResolver.resolveValue(tint.getAlpha(), alpha);
 
             if (factor > 0) {
                 RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
