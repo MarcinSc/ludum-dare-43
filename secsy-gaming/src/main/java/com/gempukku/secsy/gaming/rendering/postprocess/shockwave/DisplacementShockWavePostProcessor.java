@@ -105,12 +105,14 @@ public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem 
 
                 float sizeInScreenCoords = tmp2.dst(positionInScreenCoords) - distanceInScreenCoords;
 
+                float heightToWidth = 1f * height / width;
+
                 shaderProgram.setUniformf("u_sourceTexture", 0);
-                shaderProgram.setUniformf("u_position", positionInScreenCoords.x * 0.5f, positionInScreenCoords.y * 0.5f);
+                shaderProgram.setUniformf("u_position", positionInScreenCoords.x * 0.5f, positionInScreenCoords.y * 0.5f * heightToWidth);
                 shaderProgram.setUniformf("u_distance", distanceInScreenCoords * 0.5f);
                 shaderProgram.setUniformf("u_size", sizeInScreenCoords * 0.5f);
                 shaderProgram.setUniformf("u_alpha", effectAlpha);
-                shaderProgram.setUniformf("u_heightToWidth", 1f * height / width);
+                shaderProgram.setUniformf("u_heightToWidth", heightToWidth);
 
                 Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
                 vertexBufferObject.unbind(shaderProgram);

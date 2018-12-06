@@ -79,7 +79,14 @@ public class ReflectionsEasingResolver extends AbstractLifeCycleSystem implement
         String[] recipeChain = recipe.split(",");
         float result = value;
         for (String trigger : recipeChain) {
-            result = easingFunctionMap.get(trigger).evaluateFunction(MathUtils.clamp(value, 0, 1));
+            String parameter = null;
+            int openingBracket = trigger.indexOf("(");
+            int closingBracket = trigger.lastIndexOf(")");
+            if (openingBracket > 0 && closingBracket > openingBracket) {
+                parameter = trigger.substring(openingBracket + 1, closingBracket);
+                trigger = trigger.substring(0, openingBracket);
+            }
+            result = easingFunctionMap.get(trigger).evaluateFunction(parameter, MathUtils.clamp(result, 0, 1));
         }
         return result;
     }
@@ -106,7 +113,7 @@ public class ReflectionsEasingResolver extends AbstractLifeCycleSystem implement
         }
 
         @Override
-        public float evaluateFunction(float input) {
+        public float evaluateFunction(String parameter, float input) {
             return interpolation.apply(input);
         }
     }

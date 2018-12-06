@@ -9,7 +9,7 @@ public class OneZeroEasingFunction implements EasingFunction {
     }
 
     @Override
-    public float evaluateFunction(float input) {
+    public float evaluateFunction(String parameter, float input) {
         return 1 - input;
     }
 }

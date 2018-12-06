@@ -10,7 +10,7 @@ public class ZeroOneZeroEasingFunction implements EasingFunction {
     }
 
     @Override
-    public float evaluateFunction(float input) {
+    public float evaluateFunction(String parameter, float input) {
         if (input <= 0.5)
             return input * 2;
         else
