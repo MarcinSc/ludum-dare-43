@@ -1,6 +1,7 @@
 package com.gempukku.secsy.gaming.rendering.postprocess.shockwave;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -20,8 +21,8 @@ import com.gempukku.secsy.gaming.rendering.pipeline.RenderToPipeline;
 import com.gempukku.secsy.gaming.time.TimeManager;
 
 @RegisterSystem(
-        profiles = "displacementShockWave")
-public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem {
+        profiles = "colorShockWave")
+public class ColorShockWavePostProcessor extends AbstractLifeCycleSystem {
     @Inject
     private EasingResolver easingResolver;
     @Inject
@@ -35,7 +36,7 @@ public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem 
     public void initialize() {
         shaderProgram = new ShaderProgram(
                 Gdx.files.internal("shader/viewToScreenCoords.vert"),
-                Gdx.files.internal("shader/displacementShockWave.frag"));
+                Gdx.files.internal("shader/colorShockWave.frag"));
         if (!shaderProgram.isCompiled())
             throw new IllegalArgumentException("Error compiling shader: " + shaderProgram.getLog());
 
@@ -55,21 +56,22 @@ public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem 
     private Vector3 positionInScreenCoords = new Vector3();
     private Vector3 tmp2 = new Vector3();
 
-    @ReceiveEvent(priorityName = "gaming.renderer.shockWave.displacement")
-    public void processTint(RenderToPipeline renderToPipeline, EntityRef renderingEntity, DisplacementShockWaveComponent displacementShockWave) {
+    @ReceiveEvent(priorityName = "gaming.renderer.shockWave.color")
+    public void processTint(RenderToPipeline renderToPipeline, EntityRef renderingEntity, ColorShockWaveComponent colorShockWave) {
         long time = timeManager.getTime();
-        long effectStart = displacementShockWave.getEffectStart();
-        long effectDuration = displacementShockWave.getEffectDuration();
+        long effectStart = colorShockWave.getEffectStart();
+        long effectDuration = colorShockWave.getEffectDuration();
 
         if (effectStart <= time && time < effectStart + effectDuration) {
             float alpha = 1f * (time - effectStart) / effectDuration;
 
-            float effectAlpha = easingResolver.resolveValue(displacementShockWave.getAlpha(), alpha);
+            float effectAlpha = easingResolver.resolveValue(colorShockWave.getAlpha(), alpha);
             if (effectAlpha > 0) {
-                float distance = easingResolver.resolveValue(displacementShockWave.getDistance(), alpha);
-                float size = easingResolver.resolveValue(displacementShockWave.getSize(), alpha);
-                float noiseImpact = easingResolver.resolveValue(displacementShockWave.getNoiseImpact(), alpha);
-                float noiseVariance = easingResolver.resolveValue(displacementShockWave.getNoiseVariance(), alpha);
+                float distance = easingResolver.resolveValue(colorShockWave.getDistance(), alpha);
+                float size = easingResolver.resolveValue(colorShockWave.getSize(), alpha);
+                float noiseImpact = easingResolver.resolveValue(colorShockWave.getNoiseImpact(), alpha);
+                float noiseVariance = easingResolver.resolveValue(colorShockWave.getNoiseVariance(), alpha);
+                Color color = colorShockWave.getColor();
 
                 RenderPipeline renderPipeline = renderToPipeline.getRenderPipeline();
 
@@ -91,16 +93,16 @@ public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem 
                 Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, currentBuffer.getColorBufferTexture().getTextureObjectHandle());
 
                 Matrix4 combinedTransform = renderToPipeline.getCamera().combined;
-                positionInScreenCoords.set(displacementShockWave.getPosition());
+                positionInScreenCoords.set(colorShockWave.getPosition());
                 positionInScreenCoords.mul(combinedTransform);
 
-                tmp2.set(displacementShockWave.getPosition());
+                tmp2.set(colorShockWave.getPosition());
                 tmp2.add(distance, 0, 0);
                 tmp2.mul(combinedTransform);
 
                 float distanceInScreenCoords = tmp2.dst(positionInScreenCoords);
 
-                tmp2.set(displacementShockWave.getPosition());
+                tmp2.set(colorShockWave.getPosition());
                 tmp2.add(distance, 0, 0);
                 tmp2.add(size, 0, 0);
                 tmp2.mul(combinedTransform);
@@ -115,6 +117,7 @@ public class DisplacementShockWavePostProcessor extends AbstractLifeCycleSystem 
                 shaderProgram.setUniformf("u_size", sizeInScreenCoords * 0.5f);
                 shaderProgram.setUniformf("u_alpha", effectAlpha);
                 shaderProgram.setUniformf("u_heightToWidth", heightToWidth);
+                shaderProgram.setUniformf("u_color", color);
                 shaderProgram.setUniformf("u_noiseImpact", noiseImpact);
                 shaderProgram.setUniformf("u_noiseVariance", noiseVariance);
 

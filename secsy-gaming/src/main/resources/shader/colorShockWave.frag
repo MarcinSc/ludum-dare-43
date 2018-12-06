@@ -10,6 +10,7 @@ uniform float u_distance;
 uniform float u_size;
 uniform float u_alpha;
 uniform float u_heightToWidth;
+uniform vec4 u_color;
 uniform float u_noiseImpact;
 uniform float u_noiseVariance;
 
@@ -66,7 +67,6 @@ void main() {
     vec2 pixelPosition = v_position - 0.5;
     pixelPosition.y *= u_heightToWidth;
     float distance = distance(pixelPosition, u_position);
-    vec2 uvTexture = v_position;
 
     vec2 normalVectorFromCenter = normalize(pixelPosition - u_position);
 
@@ -74,16 +74,14 @@ void main() {
         distance += u_noiseImpact * snoise(vec3(normalVectorFromCenter * u_noiseVariance, 0.0));
     }
 
-    if (u_distance - u_size < distance && distance < u_distance + u_size) {
+    if (u_distance-u_size < distance && distance < u_distance + u_size) {
         // We're inside the shockwave
-        float sinDist = sin(PI * (distance - u_distance) / u_size);
-        vec2 textureModified = normalVectorFromCenter * sinDist * (u_size / 2.0);
-        textureModified.y *= u_heightToWidth;
-        uvTexture += textureModified;
+        if (u_alpha >= 1.0) {
+            gl_FragColor = u_color;
+        } else {
+            gl_FragColor = mix(texture2D(u_sourceTexture, v_position), u_color, u_alpha);
+        }
+    } else {
+        gl_FragColor = texture2D(u_sourceTexture, v_position);
     }
-
-    if (u_alpha >= 1.0)
-        gl_FragColor = texture2D(u_sourceTexture, uvTexture);
-    else
-        gl_FragColor = mix(texture2D(u_sourceTexture, v_position), texture2D(u_sourceTexture, uvTexture), u_alpha);
 }
