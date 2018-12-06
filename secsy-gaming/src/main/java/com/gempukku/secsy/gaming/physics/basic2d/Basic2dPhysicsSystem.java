@@ -321,20 +321,25 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
 
         if (x1Max > x2Min && x1Min < x2Max
                 && y1Max > y2Min && y1Min < y2Max) {
-            // There is an overlap
-            float width = Math.min(x1Max, x2Max) - Math.max(x1Min, x2Min);
-            if (x1Max - x1Min == width || x2Max - x2Min == width)
-                // The overlap is the whole size of either bodies
-                vectorToUse.x = Float.MAX_VALUE;
-            else
-                vectorToUse.x = Math.signum(x2Min - x1Min) * width;
-            float height = Math.min(y1Max, y2Max) - Math.max(y1Min, y2Min);
-            if (y1Max - y1Min == height || y2Max - y2Min == height)
-                vectorToUse.y = Float.MAX_VALUE;
-            else
-                vectorToUse.y = Math.signum(y2Min - y1Min) * height;
+            // There could be an overlap
+            if (obstacle.isAABB) {
+                float width = Math.min(x1Max, x2Max) - Math.max(x1Min, x2Min);
+                if (x1Max - x1Min == width || x2Max - x2Min == width)
+                    // The overlap is the whole size of either bodies
+                    vectorToUse.x = Float.MAX_VALUE;
+                else
+                    vectorToUse.x = Math.signum(x2Min - x1Min) * width;
+                float height = Math.min(y1Max, y2Max) - Math.max(y1Min, y2Min);
+                if (y1Max - y1Min == height || y2Max - y2Min == height)
+                    vectorToUse.y = Float.MAX_VALUE;
+                else
+                    vectorToUse.y = Math.signum(y2Min - y1Min) * height;
 
-            return vectorToUse;
+                return vectorToUse;
+            } else {
+                // Check for not AABBs
+                throw new UnsupportedOperationException();
+            }
         } else {
             return null;
         }
@@ -481,7 +486,7 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         ObstacleComponent obs = entity.getComponent(ObstacleComponent.class);
         Position2DComponent position = entity.getComponent(Position2DComponent.class);
         Obstacle obstacle = new Obstacle(
-                entityId, obs.getLeft(), obs.getRight(), obs.getDown(), obs.getUp());
+                entityId, obs.getLeft(), obs.getRight(), obs.getDown(), obs.getUp(), true);
         obstacle.updatePositions(position.getX(), position.getY(), position.getX(), position.getY());
 
         obstacles.put(entityId, obstacle);
