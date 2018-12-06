@@ -15,8 +15,6 @@ import static com.gempukku.secsy.gaming.camera2d.Camera2DProvider.CAMERA_2D_PROF
 
 @RegisterSystem(profiles = CAMERA_2D_PROFILE)
 public class ScreenShakeCamera {
-    public static final EasedValue DEFAULT_SHAKE_SIZE = new EasedValue(0.1f, "pow5,0-1-0");
-
     @Inject
     private TimeManager timeManager;
     @Inject
@@ -33,8 +31,6 @@ public class ScreenShakeCamera {
             float shakeSpeed = easingResolver.resolveValue(shakeCamera.getShakeSpeed(), alpha);
 
             EasedValue shakeSizeValue = shakeCamera.getShakeSize();
-            if (shakeSizeValue == null)
-                shakeSizeValue = DEFAULT_SHAKE_SIZE;
             float shakeSize = easingResolver.resolveValue(shakeSizeValue, alpha);
 
             float noiseX = ImprovedNoise.noise(time * shakeSpeed, 0, 0);
@@ -47,14 +43,5 @@ public class ScreenShakeCamera {
             cameraLocation.setNonLastingX(totalShakeX * sizeMultiplier);
             cameraLocation.setNonLastingY(totalShakeY * sizeMultiplier);
         }
-    }
-
-    private float getShakeScale(float progress) {
-        // 10% of time linear ramp up, and 10% of time linear ramp down
-        if (progress < 0.1)
-            return progress * 10;
-        if (progress > 0.9)
-            return (1 - progress) * 10;
-        return 1;
     }
 }
