@@ -130,12 +130,22 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
             float y = position.getY();
             for (Sensor sensor : sensorMap.getValue().values()) {
                 for (SensorTrigger sensorTrigger : sensorTriggers.values()) {
-                    if (hasContact(sensor, x, y, sensorTrigger)) {
-                        if (!existingSensorContacts.containsEntry(sensor, sensorTrigger)) {
-                            EntityRef sensorTriggerEntity = internalEntityManager.getEntityById(sensorTrigger.entityId);
-                            eventsToSend.put(sensorEntity, new SensorContactBegin(sensor.type, sensorTriggerEntity));
+                    if (collisionFilter != null) {
+                        EntityRef sensorTriggerEntity = internalEntityManager.getEntityById(sensorTrigger.entityId);
+                        if (collisionFilter.canSensorContact(sensor.type, sensorEntity, sensorTriggerEntity)
+                                && hasContact(sensor, x, y, sensorTrigger)) {
+                            if (!existingSensorContacts.containsEntry(sensor, sensorTrigger))
+                                eventsToSend.put(sensorEntity, new SensorContactBegin(sensor.type, sensorTriggerEntity));
+                            newContacts.put(sensor, sensorTrigger);
                         }
-                        newContacts.put(sensor, sensorTrigger);
+                    } else {
+                        if (hasContact(sensor, x, y, sensorTrigger)) {
+                            if (!existingSensorContacts.containsEntry(sensor, sensorTrigger)) {
+                                EntityRef sensorTriggerEntity = internalEntityManager.getEntityById(sensorTrigger.entityId);
+                                eventsToSend.put(sensorEntity, new SensorContactBegin(sensor.type, sensorTriggerEntity));
+                            }
+                            newContacts.put(sensor, sensorTrigger);
+                        }
                     }
                 }
             }
