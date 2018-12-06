@@ -44,12 +44,15 @@ public class DesktopLauncher {
         activeProfiles.add("aiMovement");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.fullscreen = true;
+        config.fullscreen = false;
         config.resizable = false;
 
         DisplayMode largestDisplayMode = getLargestDisplayMode();
         config.width = largestDisplayMode.getWidth();
         config.height = largestDisplayMode.getHeight();
+
+        config.width = 640;
+        config.height = 480;
 
         config.foregroundFPS = 0;
         config.vSyncEnabled = true;

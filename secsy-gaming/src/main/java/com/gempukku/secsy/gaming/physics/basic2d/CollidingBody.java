@@ -13,6 +13,8 @@ public class CollidingBody {
     public float newY;
     public boolean hadCollisionX;
     public boolean hadCollisionY;
+    public float adjustedX;
+    public float adjustedY;
 
     public CollidingBody(int entityId, float left, float right, float down, float up) {
         this.entityId = entityId;

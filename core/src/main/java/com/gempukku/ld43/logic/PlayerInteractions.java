@@ -10,6 +10,7 @@ import com.gempukku.secsy.entity.EntityRef;
 import com.gempukku.secsy.entity.dispatch.ReceiveEvent;
 import com.gempukku.secsy.gaming.audio.AudioManager;
 import com.gempukku.secsy.gaming.camera2d.component.ScreenShakeCameraComponent;
+import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.easing.EasedValue;
 import com.gempukku.secsy.gaming.input2d.EntityJumped;
 import com.gempukku.secsy.gaming.physics.basic2d.EntityCollided;
@@ -41,8 +42,8 @@ public class PlayerInteractions extends AbstractLifeCycleSystem {
     }
 
     @ReceiveEvent
-    public void playerLanded(EntityCollided entityCollided, EntityRef playerEntity, PlayerComponent player) {
-        if (entityCollided.isYAxis()) {
+    public void playerLanded(EntityCollided entityCollided, EntityRef playerEntity, PlayerComponent player, Position2DComponent position) {
+        if (entityCollided.isYAxis() && entityCollided.isPositiveY()) {
             audioManager.playSound(landed);
 
             EntityRef cameraEntity = cameraEntityProvider.getCameraEntity();

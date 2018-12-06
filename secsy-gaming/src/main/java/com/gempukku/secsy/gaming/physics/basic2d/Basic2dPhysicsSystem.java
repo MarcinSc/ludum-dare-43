@@ -233,9 +233,13 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
                         movingEntity.saveChanges();
 
                         if (collidingBody.hadCollisionX && movedHorizontally)
-                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY, oldSpeedX, oldSpeedY));
+                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY,
+                                    collidingBody.adjustedX > 0, collidingBody.adjustedY > 0,
+                                    oldSpeedX, oldSpeedY));
                         else if (collidingBody.hadCollisionY && movedVertically)
-                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY, oldSpeedX, oldSpeedY));
+                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY,
+                                    collidingBody.adjustedX > 0, collidingBody.adjustedY > 0,
+                                    oldSpeedX, oldSpeedY));
                     } else {
                         movingEntity.saveChanges();
                     }
@@ -269,6 +273,8 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         for (CollidingBody collidingBody : collidingBodies.values()) {
             collidingBody.hadCollisionX = false;
             collidingBody.hadCollisionY = false;
+            collidingBody.adjustedX = 0;
+            collidingBody.adjustedY = 0;
             for (Obstacle obstacle : obstacles.values()) {
                 if (collisionFilter == null)
                     checkForCollision(collidingBody, obstacle);
@@ -285,23 +291,23 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
     private void checkForCollision(CollidingBody collidingBody, Obstacle obstacle) {
         Vector2 collisionOverlap = getCollisionOverlap(collidingBody, obstacle, collisionTemp);
         if (collisionOverlap != null) {
-            if (Math.abs(collisionOverlap.x) < Math.abs(collisionOverlap.y)) {
+            collidingBody.newX += collisionOverlap.x;
+            collidingBody.adjustedX += collisionOverlap.x;
+            collidingBody.newY += collisionOverlap.y;
+            collidingBody.adjustedY += collisionOverlap.y;
+
+            if (Math.abs(collisionOverlap.x) > Math.abs(collisionOverlap.y)) {
                 // Adjusting x
                 collidingBody.hadCollisionX = true;
-                collidingBody.newX -= collisionOverlap.x;
             } else {
                 // Adjusting y
                 collidingBody.hadCollisionY = true;
-                collidingBody.newY -= collisionOverlap.y;
             }
         }
     }
 
     /**
-     * Returns an overlap size. If false is returned, there is no collision.
-     * If x or y is MAX_VALUE, the whole side is within the other object.
-     * If x or y is negative the collidingBody is to the right or above the obstacle.
-     * if x or y is positive the collidingBody is to the left or below the obstacle.
+     * Returns how to move the object to get out of collision. If null is returned, there is no collision.
      *
      * @param collidingBody
      * @param obstacle
@@ -328,17 +334,25 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
                     // The overlap is the whole size of either bodies
                     vectorToUse.x = Float.MAX_VALUE;
                 else
-                    vectorToUse.x = Math.signum(x2Min - x1Min) * width;
+                    vectorToUse.x = Math.signum(x1Min - x2Min) * width;
                 float height = Math.min(y1Max, y2Max) - Math.max(y1Min, y2Min);
                 if (y1Max - y1Min == height || y2Max - y2Min == height)
                     vectorToUse.y = Float.MAX_VALUE;
                 else
-                    vectorToUse.y = Math.signum(y2Min - y1Min) * height;
+                    vectorToUse.y = Math.signum(y1Min - y2Min) * height;
+
+                if (Math.abs(vectorToUse.x) < Math.abs(vectorToUse.y)) {
+                    vectorToUse.y = 0;
+                } else {
+                    vectorToUse.x = 0;
+                }
 
                 return vectorToUse;
             } else {
                 // Check for not AABBs
-                throw new UnsupportedOperationException();
+                // Using the Separating Axis Test
+                return SeparatingAxisTest.findOverlap(x1Min, x1Max, y1Min, y1Max,
+                        obstacle.nonAABBVertices, vectorToUse);
             }
         } else {
             return null;
@@ -485,8 +499,13 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         EntityRef entity = internalEntityManager.getEntityById(entityId);
         ObstacleComponent obs = entity.getComponent(ObstacleComponent.class);
         Position2DComponent position = entity.getComponent(Position2DComponent.class);
-        Obstacle obstacle = new Obstacle(
-                entityId, obs.getLeft(), obs.getRight(), obs.getDown(), obs.getUp(), true);
+        Obstacle obstacle;
+        if (obs.isAABB())
+            obstacle = new Obstacle(
+                    entityId, obs.getLeft(), obs.getRight(), obs.getDown(), obs.getUp());
+        else
+            obstacle = new Obstacle(
+                    entityId, obs.getNonAABBVertices().getVertices());
         obstacle.updatePositions(position.getX(), position.getY(), position.getX(), position.getY());
 
         obstacles.put(entityId, obstacle);
