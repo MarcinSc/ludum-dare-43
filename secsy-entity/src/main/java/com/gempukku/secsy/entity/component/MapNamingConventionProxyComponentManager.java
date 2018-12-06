@@ -289,29 +289,59 @@ public class MapNamingConventionProxyComponentManager implements ComponentManage
         }
 
         private Object getDefaultValue(Object proxy, Method method, Class<?> resultClass) {
-            if (resultClass.isPrimitive()) {
-                if (resultClass == boolean.class) {
-                    return false;
-                } else if (resultClass == float.class) {
-                    return 0f;
-                } else if (resultClass == double.class) {
-                    return 0d;
-                } else if (resultClass == long.class) {
-                    return 0L;
-                } else if (resultClass == int.class) {
-                    return 0;
-                } else if (resultClass == short.class) {
-                    return (short) 0;
-                } else if (resultClass == char.class) {
-                    return (char) 0;
-                } else if (resultClass == byte.class) {
-                    return (byte) 0;
+            DefaultValue defaultValue = method.getAnnotation(DefaultValue.class);
+            if (defaultValue != null) {
+                if (resultClass == String.class)
+                    return defaultValue.value();
+
+                if (resultClass.isPrimitive()) {
+                    if (resultClass == boolean.class) {
+                        return Boolean.parseBoolean(defaultValue.value());
+                    } else if (resultClass == float.class) {
+                        return Float.parseFloat(defaultValue.value());
+                    } else if (resultClass == double.class) {
+                        return Double.parseDouble(defaultValue.value());
+                    } else if (resultClass == long.class) {
+                        return Long.parseLong(defaultValue.value());
+                    } else if (resultClass == int.class) {
+                        return Integer.parseInt(defaultValue.value());
+                    } else if (resultClass == short.class) {
+                        return Short.parseShort(defaultValue.value());
+                    } else if (resultClass == char.class) {
+                        return defaultValue.value().charAt(0);
+                    } else if (resultClass == byte.class) {
+                        return Byte.parseByte(defaultValue.value());
+                    }
+                    throw new IllegalStateException("Unable to find default value for this type");
+                } else if (componentFieldConverter.hasConverterForType(resultClass)) {
+                    return componentFieldConverter.convertTo(defaultValue.value(), resultClass);
                 }
-                throw new IllegalStateException("Unable to find default value for this type");
-            } else if (componentFieldConverter.hasConverterForType(resultClass)) {
-                return componentFieldConverter.getDefaultValue(resultClass);
+                throw new IllegalStateException("@DefaultValue specified but cannot convert via known means");
+            } else {
+                if (resultClass.isPrimitive()) {
+                    if (resultClass == boolean.class) {
+                        return false;
+                    } else if (resultClass == float.class) {
+                        return 0f;
+                    } else if (resultClass == double.class) {
+                        return 0d;
+                    } else if (resultClass == long.class) {
+                        return 0L;
+                    } else if (resultClass == int.class) {
+                        return 0;
+                    } else if (resultClass == short.class) {
+                        return (short) 0;
+                    } else if (resultClass == char.class) {
+                        return (char) 0;
+                    } else if (resultClass == byte.class) {
+                        return (byte) 0;
+                    }
+                    throw new IllegalStateException("Unable to find default value for this type");
+                } else if (componentFieldConverter.hasConverterForType(resultClass)) {
+                    return componentFieldConverter.getDefaultValue(resultClass);
+                }
+                return null;
             }
-            return null;
         }
 
         private Object convertToResult(Object proxy, Method method, Object value, Class<?> resultClass) {
