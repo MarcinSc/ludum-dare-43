@@ -2,7 +2,6 @@ package com.gempukku.ld43.logic.damage;
 
 import com.gempukku.ld43.logic.level.EntityOutOfBounds;
 import com.gempukku.ld43.logic.level.PlayerDied;
-import com.gempukku.ld43.model.DestroyOnCollisionComponent;
 import com.gempukku.ld43.model.DustBunnyComponent;
 import com.gempukku.ld43.model.DustComponent;
 import com.gempukku.ld43.model.PlayerComponent;
@@ -18,7 +17,6 @@ import com.gempukku.secsy.entity.index.EntityIndex;
 import com.gempukku.secsy.entity.index.EntityIndexManager;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.particle2d.ParticleEngine;
-import com.gempukku.secsy.gaming.physics.basic2d.EntityCollided;
 import com.gempukku.secsy.gaming.time.TimeEntityProvider;
 
 import java.util.Iterator;
@@ -76,12 +74,6 @@ public class DeathSystem extends AbstractLifeCycleSystem {
     @ReceiveEvent
     public void dustBunnyDamaged(EntityDamaged entityDamaged, EntityRef entity, DustBunnyComponent dustBunny, DustComponent dust, Position2DComponent position) {
         particleEngine.addParticleEffect("particles/explosion.p", position.getX(), position.getY(), dust.getColor(), null);
-        entityManager.destroyEntity(entity);
-    }
-
-    @ReceiveEvent
-    public void destroyOnCollision(EntityCollided entityCollided, EntityRef entity, DestroyOnCollisionComponent destroyOnCollision, Position2DComponent position) {
-        particleEngine.addParticleEffect(destroyOnCollision.getParticleEffect(), position.getX(), position.getY(), destroyOnCollision.getParticleColor(), null);
         entityManager.destroyEntity(entity);
     }
 

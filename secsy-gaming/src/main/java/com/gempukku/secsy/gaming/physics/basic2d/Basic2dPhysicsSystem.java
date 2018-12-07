@@ -181,8 +181,20 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         float y2Min = sensorTrigger.y + sensorTrigger.down;
         float y2Max = sensorTrigger.y + sensorTrigger.up;
 
-        return (x1Max > x2Min && x1Min < x2Max
-                && y1Max > y2Min && y1Min < y2Max);
+        if (x1Max > x2Min && x1Min < x2Max
+                && y1Max > y2Min && y1Min < y2Max) {
+            // There could be an overlap
+            if (sensorTrigger.isAABB) {
+                return true;
+            } else {
+                // Check for not AABBs
+                // Using the Separating Axis Test
+                return SeparatingAxisTest.findOverlap(x1Min, x1Max, y1Min, y1Max,
+                        sensorTrigger.nonAABBVertices, new Vector2()) != null;
+            }
+        } else {
+            return false;
+        }
     }
 
     private void applyMovement(float seconds) {
@@ -223,23 +235,11 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
 
                     if (collidingBody.hadCollisionX || collidingBody.hadCollisionY) {
                         MovingComponent moving = movingEntity.getComponent(MovingComponent.class);
-                        float oldSpeedX = moving.getSpeedX();
-                        float oldSpeedY = moving.getSpeedY();
-
                         if (collidingBody.hadCollisionX)
                             moving.setSpeedX(0);
                         else
                             moving.setSpeedY(0);
                         movingEntity.saveChanges();
-
-                        if (collidingBody.hadCollisionX && movedHorizontally)
-                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY,
-                                    collidingBody.adjustedX > 0, collidingBody.adjustedY > 0,
-                                    oldSpeedX, oldSpeedY));
-                        else if (collidingBody.hadCollisionY && movedVertically)
-                            movingEntity.send(new EntityCollided(collidingBody.hadCollisionX, collidingBody.hadCollisionY,
-                                    collidingBody.adjustedX > 0, collidingBody.adjustedY > 0,
-                                    oldSpeedX, oldSpeedY));
                     } else {
                         movingEntity.saveChanges();
                     }
@@ -444,6 +444,13 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         Position2DComponent position = entity.getComponent(Position2DComponent.class);
         SensorTrigger sensorTrigger = new SensorTrigger(
                 entityId, st.getLeft(), st.getRight(), st.getDown(), st.getUp());
+        SensorTrigger obstacle;
+        if (st.isAABB())
+            obstacle = new SensorTrigger(
+                    entityId, st.getLeft(), st.getRight(), st.getDown(), st.getUp());
+        else
+            obstacle = new SensorTrigger(
+                    entityId, st.getNonAABBVertices().getVertices());
         sensorTrigger.updatePosition(position.getX(), position.getY());
 
         sensorTriggers.put(entityId, sensorTrigger);
@@ -459,6 +466,11 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         sensorTrigger.right = st.getRight();
         sensorTrigger.down = st.getDown();
         sensorTrigger.up = st.getUp();
+        sensorTrigger.isAABB = st.isAABB();
+        if (!sensorTrigger.isAABB)
+            sensorTrigger.nonAABBVertices = st.getNonAABBVertices().getVertices();
+        else
+            sensorTrigger.nonAABBVertices = null;
 
         sensorTrigger.updatePosition(position.getX(), position.getY());
     }
@@ -521,6 +533,11 @@ public class Basic2dPhysicsSystem extends AbstractLifeCycleSystem implements Phy
         obstacle.right = obs.getRight();
         obstacle.down = obs.getDown();
         obstacle.up = obs.getUp();
+        obstacle.isAABB = obs.isAABB();
+        if (!obstacle.isAABB)
+            obstacle.nonAABBVertices = obs.getNonAABBVertices().getVertices();
+        else
+            obstacle.nonAABBVertices = null;
 
         obstacle.updatePositions(position.getX(), position.getY(), position.getX(), position.getY());
     }

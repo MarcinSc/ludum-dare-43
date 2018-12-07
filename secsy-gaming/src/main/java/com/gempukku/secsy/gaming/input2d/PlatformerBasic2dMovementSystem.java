@@ -49,6 +49,7 @@ public class PlatformerBasic2dMovementSystem extends AbstractLifeCycleSystem {
                 && contactBegin.getSensorTrigger().hasComponent(GroundComponent.class)) {
             controlled.setGrounded(true);
             entity.saveChanges();
+            entity.send(new EntityLanded());
         }
     }
 

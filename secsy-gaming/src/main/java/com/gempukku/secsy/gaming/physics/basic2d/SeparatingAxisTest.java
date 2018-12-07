@@ -41,9 +41,13 @@ public class SeparatingAxisTest {
 
             // We only want to know how to move the object based on its own axis,
             // not obstacle's
-            if (!axis.obstacle && overlap < smallestOverlap) {
+            if (overlap < smallestOverlap) {
                 smallestOverlap = overlap;
                 vectorToUse.set(axis.axis).scl(vectorToUse.len() * overlap * (aabbOnTop ? 1 : -1));
+                if (Math.abs(vectorToUse.x) > Math.abs(vectorToUse.y))
+                    vectorToUse.y = 0;
+                else
+                    vectorToUse.x = 0;
             }
         }
 

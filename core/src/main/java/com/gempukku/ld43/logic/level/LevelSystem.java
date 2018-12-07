@@ -14,6 +14,7 @@ import com.gempukku.secsy.entity.game.GameEntityProvider;
 import com.gempukku.secsy.gaming.component.Position2DComponent;
 import com.gempukku.secsy.gaming.easing.EasedValue;
 import com.gempukku.secsy.gaming.physics.basic2d.ObstacleComponent;
+import com.gempukku.secsy.gaming.physics.basic2d.ObstacleVertices;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorContactBegin;
 import com.gempukku.secsy.gaming.physics.basic2d.SensorTriggerComponent;
 import com.gempukku.secsy.gaming.rendering.pipeline.CameraEntityProvider;
@@ -120,8 +121,18 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         }
         for (Object platform : platformArray) {
             JSONObject platformObj = (JSONObject) platform;
-            createPlatform((String) platformObj.get("type"), getFloat(platformObj, "x"), getFloat(platformObj, "y"),
-                    getFloat(platformObj, "width"), getFloat(platformObj, "height"));
+            boolean hasVertices = platformObj.get("vertices") != null;
+            if (hasVertices) {
+                String[] verticesSplit = ((String) platformObj.get("vertices")).split(",");
+                float[] vertices = new float[verticesSplit.length];
+                for (int i = 0; i < verticesSplit.length; i++)
+                    vertices[i] = Float.parseFloat(verticesSplit[i]);
+                createPlatform((String) platformObj.get("type"), getFloat(platformObj, "x"), getFloat(platformObj, "y"),
+                        getFloat(platformObj, "width"), getFloat(platformObj, "height"), vertices);
+            } else {
+                createPlatform((String) platformObj.get("type"), getFloat(platformObj, "x"), getFloat(platformObj, "y"),
+                        getFloat(platformObj, "width"), getFloat(platformObj, "height"), null);
+            }
         }
         for (Object object : objectArray) {
             JSONObject objectObj = (JSONObject) object;
@@ -175,7 +186,7 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         createEntityAtPosition("playerEntity", x, y);
     }
 
-    private void createPlatform(String type, float x, float y, float width, float height) {
+    private void createPlatform(String type, float x, float y, float width, float height, float[] vertices) {
         EntityRef platformEntity = entityManager.createEntityFromPrefab(type);
 
         Position2DComponent position = platformEntity.getComponent(Position2DComponent.class);
@@ -185,10 +196,18 @@ public class LevelSystem extends AbstractLifeCycleSystem {
         ObstacleComponent obstacle = platformEntity.getComponent(ObstacleComponent.class);
         obstacle.setRight(width);
         obstacle.setUp(height);
+        if (vertices != null) {
+            obstacle.setAABB(false);
+            obstacle.setNonAABBVertices(new ObstacleVertices(vertices));
+        }
 
         SensorTriggerComponent sensorTrigger = platformEntity.getComponent(SensorTriggerComponent.class);
         sensorTrigger.setRight(width);
         sensorTrigger.setUp(height);
+        if (vertices != null) {
+            sensorTrigger.setAABB(false);
+            sensorTrigger.setNonAABBVertices(new ObstacleVertices(vertices));
+        }
 
         PlatformComponent platform = platformEntity.getComponent(PlatformComponent.class);
         platform.setRight(width);
