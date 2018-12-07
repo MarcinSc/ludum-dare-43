@@ -70,7 +70,7 @@ public class ColorTintPostProcessor extends AbstractLifeCycleSystem {
                 int height = currentBuffer.getHeight();
                 Color color = tint.getColor();
 
-                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(currentBuffer);
 
                 newBuffer.begin();
 

@@ -39,13 +39,19 @@ public class RenderPipelineImpl implements RenderPipeline {
     }
 
     @Override
-    public FrameBuffer getNewFrameBuffer(int width, int height) {
+    public FrameBuffer getNewFrameBuffer(FrameBuffer takeSettingsFrom) {
+        return getNewFrameBuffer(takeSettingsFrom.getWidth(), takeSettingsFrom.getHeight(),
+                takeSettingsFrom.getColorBufferTexture().getTextureData().getFormat());
+    }
+
+    @Override
+    public FrameBuffer getNewFrameBuffer(int width, int height, Pixmap.Format format) {
         FrameBuffer buffer = extractFrameBuffer(width, height, this.newFrameBuffers);
         if (buffer != null) return buffer;
         buffer = extractFrameBuffer(width, height, this.oldFrameBuffers);
         if (buffer != null) return buffer;
 
-        return new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        return new FrameBuffer(format, width, height, false);
     }
 
     private FrameBuffer extractFrameBuffer(int width, int height, List<FrameBuffer> frameBuffers) {

@@ -80,7 +80,7 @@ public class ColorShockWavePostProcessor extends AbstractLifeCycleSystem {
                 int width = currentBuffer.getWidth();
                 int height = currentBuffer.getHeight();
 
-                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(width, height);
+                FrameBuffer newBuffer = renderPipeline.getNewFrameBuffer(currentBuffer);
 
                 newBuffer.begin();
 

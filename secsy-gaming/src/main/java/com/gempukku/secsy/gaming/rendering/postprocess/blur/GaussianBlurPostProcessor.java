@@ -102,7 +102,7 @@ public class GaussianBlurPostProcessor extends AbstractLifeCycleSystem {
         FrameBuffer currentBuffer = renderPipeline.getCurrentBuffer();
         int textureHandle = currentBuffer.getColorBufferTexture().getTextureObjectHandle();
 
-        FrameBuffer frameBuffer = renderPipeline.getNewFrameBuffer(currentBuffer.getWidth(), currentBuffer.getHeight());
+        FrameBuffer frameBuffer = renderPipeline.getNewFrameBuffer(currentBuffer);
         frameBuffer.begin();
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);

@@ -1,12 +1,15 @@
 package com.gempukku.secsy.gaming.rendering.pipeline;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.gempukku.secsy.context.annotation.Inject;
 import com.gempukku.secsy.context.annotation.RegisterSystem;
 import com.gempukku.secsy.context.system.AbstractLifeCycleSystem;
@@ -22,6 +25,8 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
     private CameraEntityProvider cameraEntityProvider;
     @Inject
     private TimeManager timeManager;
+    @Inject(optional = true)
+    private RenderStrategy renderStrategy = new DefaultRenderStrategy();
 
     private ShaderProgram shaderProgram;
     private VertexBufferObject vertexBufferObject;
@@ -42,7 +47,7 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
                 1, 1, 0};
         short[] indices = {0, 1, 2, 2, 1, 3};
 
-        vertexBufferObject = new VertexBufferObject(true, 4, VertexAttribute.Position());
+        vertexBufferObject = new VertexBufferObject(false, 4, VertexAttribute.Position());
         indexBufferObject = new IndexBufferObject(true, indices.length);
         vertexBufferObject.setVertices(verticeData, 0, verticeData.length);
         indexBufferObject.setIndices(indices, 0, indices.length);
@@ -52,12 +57,15 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
     public void render(int width, int height) {
         EntityRef cameraEntity = cameraEntityProvider.getCameraEntity();
         if (cameraEntity != null) {
-            FrameBuffer drawFrameBuffer = renderPipeline.getNewFrameBuffer(width, height);
+            int renderBufferWidth = renderStrategy.getRenderBufferWidth(width, height);
+            int renderBufferHeight = renderStrategy.getRenderBufferHeight(width, height);
+            Pixmap.Format renderBufferFormat = renderStrategy.getRenderBufferFormat(width, height);
+            FrameBuffer drawFrameBuffer = renderPipeline.getNewFrameBuffer(renderBufferWidth, renderBufferHeight, renderBufferFormat);
             try {
                 renderPipeline.setCurrentBuffer(drawFrameBuffer);
 
                 renderPipeline.getCurrentBuffer().begin();
-                cleanBuffer();
+                cleanBuffer(renderStrategy.getScreenFillColor());
                 renderPipeline.getCurrentBuffer().end();
 
                 float deltaTime = timeManager.getTimeSinceLastUpdate() / 1000f;
@@ -65,16 +73,16 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
                 GetCamera getCamera = new GetCamera(deltaTime, width, height);
                 cameraEntity.send(getCamera);
 
-                cameraEntity.send(new RenderToPipeline(renderPipeline, getCamera.getCamera(), deltaTime, width, height));
+                cameraEntity.send(new RenderToPipeline(renderPipeline, getCamera.getCamera(), deltaTime, renderBufferWidth, renderBufferHeight));
 
-                renderToScreen();
+                renderToScreen(width, height, renderBufferWidth, renderBufferHeight);
 
                 renderPipeline.returnFrameBuffer(renderPipeline.getCurrentBuffer());
             } finally {
                 renderPipeline.ageOutBuffers();
             }
         } else {
-            cleanBuffer();
+            cleanBuffer(renderStrategy.getScreenFillColor());
         }
         renderPipeline.ageOutBuffers();
     }
@@ -87,10 +95,28 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
         renderPipeline.cleanup();
     }
 
-    private void renderToScreen() {
+    private Rectangle tempRectangle = new Rectangle();
+    private float[] vertices = new float[12];
+
+    private void renderToScreen(int screenWidth, int screenHeight, int renderWidth, int renderHeight) {
         shaderProgram.begin();
 
-        cleanBuffer();
+        cleanBuffer(renderStrategy.getScreenFillColor());
+
+        Rectangle renderRectangle = renderStrategy.getScreenRenderRectangle(screenWidth, screenHeight, renderWidth, renderHeight, tempRectangle);
+        float x = renderRectangle.x / screenWidth;
+        float y = renderRectangle.y / screenHeight;
+        float width = renderRectangle.width / screenWidth;
+        float height = renderRectangle.height / screenHeight;
+        vertices[0] = x;
+        vertices[1] = y;
+        vertices[3] = x;
+        vertices[4] = height;
+        vertices[6] = width;
+        vertices[7] = y;
+        vertices[9] = width;
+        vertices[10] = height;
+        vertexBufferObject.setVertices(vertices, 0, 12);
 
         vertexBufferObject.bind(shaderProgram);
         indexBufferObject.bind();
@@ -99,8 +125,8 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_2D, renderPipeline.getCurrentBuffer().getColorBufferTexture().getTextureObjectHandle());
 
         shaderProgram.setUniformf("u_sourceTexture", 0);
-        shaderProgram.setUniformf("u_textureStart", 0, 0);
-        shaderProgram.setUniformf("u_textureSize", 1, 1);
+        shaderProgram.setUniformf("u_textureStart", x, y);
+        shaderProgram.setUniformf("u_textureSize", width, height);
 
         Gdx.gl20.glDrawElements(Gdx.gl20.GL_TRIANGLES, indexBufferObject.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
         vertexBufferObject.unbind(shaderProgram);
@@ -109,8 +135,8 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
         shaderProgram.end();
     }
 
-    private void cleanBuffer() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+    private void cleanBuffer(Color color) {
+        Gdx.gl.glClearColor(color.r, color.g, color.b, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 }
