@@ -111,11 +111,11 @@ public class RenderPipelineRenderer extends AbstractLifeCycleSystem implements R
         vertices[0] = x;
         vertices[1] = y;
         vertices[3] = x;
-        vertices[4] = height;
-        vertices[6] = width;
+        vertices[4] = y + height;
+        vertices[6] = x + width;
         vertices[7] = y;
-        vertices[9] = width;
-        vertices[10] = height;
+        vertices[9] = x + width;
+        vertices[10] = y + height;
         vertexBufferObject.setVertices(vertices, 0, 12);
 
         vertexBufferObject.bind(shaderProgram);

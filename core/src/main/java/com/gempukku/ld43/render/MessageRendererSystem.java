@@ -63,6 +63,7 @@ public class MessageRendererSystem extends AbstractLifeCycleSystem {
             renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
             float color = easingResolver.resolveValue("pow5,0-1-0", 1f * (time - textStartTime) / textDuration);
             messageFont.setColor(1, 1, 1, color);
+            spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, screenWidth, screenHeight);
             spriteBatch.begin();
             messageFont.draw(spriteBatch, text, 0, screenHeight / 7, screenWidth, Align.center, true);
             spriteBatch.end();

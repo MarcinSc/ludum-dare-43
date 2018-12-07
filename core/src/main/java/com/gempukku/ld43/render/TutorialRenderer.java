@@ -54,6 +54,7 @@ public class TutorialRenderer extends AbstractLifeCycleSystem {
         for (EntityRef tutorial : tutorials) {
             String text = tutorial.getComponent(TutorialComponent.class).getText();
             renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
+            spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, screenWidth, screenHeight);
             spriteBatch.begin();
             messageFont.draw(spriteBatch, text, 0, screenHeight - 10, screenWidth, Align.center, true);
             spriteBatch.end();

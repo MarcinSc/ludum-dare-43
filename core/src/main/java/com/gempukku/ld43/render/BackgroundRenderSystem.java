@@ -32,6 +32,7 @@ public class BackgroundRenderSystem extends AbstractLifeCycleSystem {
                 1f * width / wallpaper.getWidth(), 1f * height / wallpaper.getHeight());
 
         renderToPipeline.getRenderPipeline().getCurrentBuffer().begin();
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         spriteBatch.begin();
         spriteBatch.draw(region, 0, 0, width, height);
         spriteBatch.end();
